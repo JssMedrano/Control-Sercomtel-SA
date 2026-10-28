@@ -14,6 +14,7 @@ const permissionBanner = document.querySelector("#permissionBanner");
 const permissionText = document.querySelector("#permissionText");
 const permissionButton = document.querySelector("#permissionButton");
 const alarmWorker = new Worker("alarm-worker.js");
+let audioContext;
 
 function localDateKey(date = new Date()) {
   const offset = date.getTimezoneOffset() * 60000;
@@ -112,6 +113,32 @@ function showNotification(message) {
   setTimeout(() => notification.remove(), 10000);
 }
 
+function unlockAudio() {
+  if (!audioContext) {
+    audioContext = new AudioContext();
+  }
+  if (audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+}
+
+function playAlarmBeep() {
+  if (!audioContext) return;
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  const startTime = audioContext.currentTime;
+
+  oscillator.type = "sine";
+  oscillator.frequency.value = 880;
+  gain.gain.setValueAtTime(0.0001, startTime);
+  gain.gain.exponentialRampToValueAtTime(0.16, startTime + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.18);
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+  oscillator.start(startTime);
+  oscillator.stop(startTime + 0.2);
+}
+
 function updatePermissionBanner() {
   if (!("Notification" in window)) {
     permissionBanner.hidden = false;
@@ -160,10 +187,12 @@ alarmWorker.addEventListener("message", (event) => {
   alarm.lastTriggered = dateKey;
   saveState();
   showNotification(label || `Pausa ${index + 1}`);
+  playAlarmBeep();
   if ("Notification" in window && Notification.permission === "granted") {
     new Notification("Momento de tu pausa", {
       body: label || `Pausa ${index + 1}`,
       tag: `retention-break-${index}`,
+      silent: true,
     });
   }
 });
@@ -173,10 +202,14 @@ alarmWorker.addEventListener("error", (event) => {
 });
 
 document.querySelectorAll(".add-button").forEach((button) => {
-  button.addEventListener("click", () => addCount(button.dataset.type));
+  button.addEventListener("click", () => {
+    unlockAudio();
+    addCount(button.dataset.type);
+  });
 });
 
 alarmList.addEventListener("input", (event) => {
+  unlockAudio();
   const target = event.target;
   const index = Number(target.dataset.alarm);
   const field = target.dataset.field;
@@ -203,7 +236,12 @@ alarmList.addEventListener("input", (event) => {
   syncAlarmsWithWorker();
 });
 
-permissionButton.addEventListener("click", requestNotificationPermission);
+permissionButton.addEventListener("click", () => {
+  unlockAudio();
+  requestNotificationPermission();
+});
+
+document.addEventListener("click", unlockAudio, { once: true });
 
 document.querySelector("#clearHistory").addEventListener("click", () => {
   if (!Object.keys(state.days).length) return;
