@@ -256,6 +256,22 @@ function buildReport(month, title) {
   };
 }
 
+function openWhatsAppMessage(message) {
+  const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function getDailyReportMessage() {
+  const report = buildReport(localDateKey(), `Informe diario · ${formatDate(localDateKey())}`);
+  return `${report.title}\n\n${report.content}`;
+}
+
+function getMonthlyReportMessage() {
+  const month = monthSelector.value || currentMonthKey();
+  const report = buildReport(month, `Informe mensual · ${month}`);
+  return `${report.title}\n\n${report.content}`;
+}
+
 async function sendReport(month, type, markAsSent = false) {
   const title = type === "daily" ? `Informe diario · ${formatDate(month)}` : `Informe mensual · ${month}`;
   const report = buildReport(month, title);
@@ -267,6 +283,7 @@ async function sendReport(month, type, markAsSent = false) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(report),
     });
+
     if (!response.ok) {
       const result = await response.json().catch(() => ({}));
       throw new Error(result.error || "Discord rechazó el informe.");
@@ -313,6 +330,7 @@ function renderNotes() {
     card.append(title, content, date);
     notesList.append(card);
   });
+
 }
 
 function renderScripts() {
@@ -578,6 +596,12 @@ document.querySelector("#sendDailyReport").addEventListener("click", () => {
 document.querySelector("#sendMonthlyReport").addEventListener("click", () => {
   sendReport(monthSelector.value || currentMonthKey(), "monthly");
 });
+document.querySelector("#sendDailyWhatsApp").addEventListener("click", () => {
+  openWhatsAppMessage(getDailyReportMessage());
+});
+document.querySelector("#sendMonthlyWhatsApp").addEventListener("click", () => {
+  openWhatsAppMessage(getMonthlyReportMessage());
+});
 
 noteForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -618,6 +642,27 @@ noteForm.addEventListener("submit", async (event) => {
     submitButton.disabled = false;
   }
   renderNotes();
+});
+
+document.querySelector("#sendNoteWhatsApp").addEventListener("click", () => {
+  const title = document.querySelector("#noteTitle").value.trim();
+  const content = document.querySelector("#noteContent").value.trim();
+  if (!title || !content) {
+    noteStatus.className = "note-status error";
+    noteStatus.textContent = "Escribe un título y contenido antes de abrir WhatsApp.";
+    return;
+  }
+  openWhatsAppMessage(`Nota importante: ${title}\n\n${content}`);
+});
+
+document.querySelector("#sendSaturdayWhatsApp").addEventListener("click", () => {
+  const saturdayDate = state.saturdayReminder.saturdayDate;
+  if (!saturdayDate) {
+    reminderStatus.textContent = "Selecciona un sábado antes de enviar el recordatorio.";
+    reminderStatus.className = "reminder-status error";
+    return;
+  }
+  openWhatsAppMessage(`Recordatorio de jornada\n\nEste sábado (${formatDate(saturdayDate)}) tienes jornada laboral.`);
 });
 
 notesList.addEventListener("click", (event) => {
