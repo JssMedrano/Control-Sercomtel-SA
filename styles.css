@@ -89,7 +89,8 @@ h1 span, em { color: var(--blue); font-style: normal; }
 .chart-bar { width: 100%; min-height: 2px; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, var(--blue), #315b91); }
 .chart-column span { color: var(--faint); font-size: 9px; }
 .empty-chart { align-self: center; width: 100%; color: var(--faint); font-size: 12px; text-align: center; }
-.report-actions { display: flex; align-items: center; gap: 12px; margin-top: 13px; }
+.report-actions { display: flex; align-items: center; gap: 12px; margin-top: 13px; flex-wrap: wrap; }
+.report-schedule { color: var(--faint); font-size: 10px; }
 .report-status { color: var(--muted); font-size: 11px; }
 .report-status.success { color: var(--green); }
 .report-status.error { color: var(--orange); }

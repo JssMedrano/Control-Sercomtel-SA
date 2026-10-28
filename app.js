@@ -182,7 +182,7 @@ async function sendReport(month, type, markAsSent = false) {
 
 function checkScheduledReports() {
   const now = new Date();
-  if (now.getHours() !== 18 || now.getMinutes() !== 0) return;
+  if (now.getHours() !== 16 || now.getMinutes() !== 12) return;
   const today = localDateKey(now);
   if (!state.reportSent[`daily-${today}`]) sendReport(today, "daily", true);
   const tomorrow = new Date(now);
