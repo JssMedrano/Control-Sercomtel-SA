@@ -21,6 +21,7 @@ const emptyNotes = document.querySelector("#emptyNotes");
 const noteForm = document.querySelector("#noteForm");
 const notesCount = document.querySelector("#notesCount");
 const noteStatus = document.querySelector("#noteStatus");
+const reportStatus = document.querySelector("#reportStatus");
 let audioContext;
 
 function localDateKey(date = new Date()) {
@@ -41,6 +42,7 @@ function loadState() {
       return {
         days: saved.days || {},
         notes: Array.isArray(saved.notes) ? saved.notes : [],
+        reportSent: saved.reportSent || {},
         alarms: Array.from({ length: alarmCount }, (_, index) => ({
           time: saved.alarms?.[index]?.time || "",
           label: saved.alarms?.[index]?.label || `Pausa ${index + 1}`,
@@ -54,6 +56,7 @@ function loadState() {
   return {
     days: {},
     notes: [],
+    reportSent: {},
     alarms: Array.from({ length: alarmCount }, (_, index) => ({
       time: "",
       label: `Pausa ${index + 1}`,
@@ -121,6 +124,72 @@ function renderMonthlyDashboard() {
       <span>${Number(date.slice(8))}</span>
     </div>`;
   }).join("") : `<div class="empty-chart">No hay atendimientos registrados en este mes.</div>`;
+}
+
+function getMonthDays(month) {
+  return Object.entries(state.days)
+    .filter(([date]) => date.startsWith(month))
+    .sort(([first], [second]) => first.localeCompare(second));
+}
+
+function buildReport(month, title) {
+  const monthDays = getMonthDays(month);
+  const totals = monthDays.reduce((result, [, counts]) => ({
+    fiber: result.fiber + counts.fiber,
+    phone: result.phone + counts.phone,
+  }), { fiber: 0, phone: 0 });
+  const total = totals.fiber + totals.phone;
+  const lines = monthDays.map(([date, counts]) =>
+    `${formatDate(date)}: ${counts.fiber + counts.phone} (${counts.fiber} fibras, ${counts.phone} teléfonos)`);
+  return {
+    title,
+    content: [
+      `Total: ${total} atendimientos`,
+      `Media diaria: ${monthDays.length ? (total / monthDays.length).toFixed(1) : "0"}`,
+      `Días registrados: ${monthDays.length}`,
+      `Fibras: ${totals.fiber} | Teléfonos: ${totals.phone}`,
+      lines.length ? `\nDetalle:\n${lines.join("\n")}` : "\nSin registros.",
+    ].join("\n"),
+  };
+}
+
+async function sendReport(month, type, markAsSent = false) {
+  const title = type === "daily" ? `Informe diario · ${formatDate(month)}` : `Informe mensual · ${month}`;
+  const report = buildReport(month, title);
+  reportStatus.className = "report-status";
+  reportStatus.textContent = "Enviando informe...";
+  try {
+    const response = await fetch("/api/discord-report", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(report),
+    });
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      throw new Error(result.error || "Discord rechazó el informe.");
+    }
+    if (markAsSent) {
+      state.reportSent[`${type}-${month}`] = true;
+      saveState();
+    }
+    reportStatus.className = "report-status success";
+    reportStatus.textContent = "Informe enviado a Discord.";
+  } catch (error) {
+    reportStatus.className = "report-status error";
+    reportStatus.textContent = `No se pudo enviar: ${error.message}`;
+  }
+}
+
+function checkScheduledReports() {
+  const now = new Date();
+  if (now.getHours() !== 18 || now.getMinutes() !== 0) return;
+  const today = localDateKey(now);
+  if (!state.reportSent[`daily-${today}`]) sendReport(today, "daily", true);
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  if (tomorrow.getMonth() !== now.getMonth() && !state.reportSent[`monthly-${today.slice(0, 7)}`]) {
+    sendReport(today.slice(0, 7), "monthly", true);
+  }
 }
 
 function renderNotes() {
@@ -316,6 +385,12 @@ document.querySelector("#clearHistory").addEventListener("click", () => {
 
 monthSelector.value = currentMonthKey();
 monthSelector.addEventListener("change", renderMonthlyDashboard);
+document.querySelector("#sendDailyReport").addEventListener("click", () => {
+  sendReport(localDateKey(), "daily");
+});
+document.querySelector("#sendMonthlyReport").addEventListener("click", () => {
+  sendReport(monthSelector.value || currentMonthKey(), "monthly");
+});
 
 noteForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -381,3 +456,4 @@ renderDashboard();
 renderAlarms();
 updatePermissionBanner();
 syncAlarmsWithWorker();
+setInterval(checkScheduledReports, 30000);

@@ -75,10 +75,13 @@
             <p class="eyebrow">ANÁLISIS</p>
             <h2>Dashboard mensual</h2>
           </div>
-          <label class="month-picker">
-            <span>Mes</span>
-            <input id="monthSelector" type="month" />
-          </label>
+          <div class="analytics-actions">
+            <label class="month-picker">
+              <span>Mes</span>
+              <input id="monthSelector" type="month" />
+            </label>
+            <button class="report-button" id="sendMonthlyReport" type="button">Enviar mensual</button>
+          </div>
         </div>
         <div class="analytics-summary">
           <div class="summary-item">
@@ -103,6 +106,10 @@
           </div>
         </div>
         <div class="chart" id="monthlyChart" aria-label="Atendimientos por día"></div>
+        <div class="report-actions">
+          <button class="text-button" id="sendDailyReport" type="button">Enviar informe de hoy a Discord</button>
+          <span class="report-status" id="reportStatus" aria-live="polite"></span>
+        </div>
       </section>
 
       <div class="content-grid">
