@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1018" />
+    <title>Panel de retención</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">R</div>
+          <div>
+            <p class="eyebrow">CENTRO DE OPERACIONES</p>
+            <h1>Retención<span>.</span></h1>
+          </div>
+        </div>
+        <div class="live-status"><span class="status-dot"></span> Jornada activa</div>
+      </header>
+
+      <section class="hero">
+        <div>
+          <p class="eyebrow">RESUMEN DE HOY <span id="currentDate"></span></p>
+          <h2>Tu jornada, <em>bajo control.</em></h2>
+          <p class="hero-copy">Registra cada atendimiento y mantén tus pausas en el momento justo.</p>
+        </div>
+        <div class="today-total">
+          <span>Total de hoy</span>
+          <strong id="todayTotal">0</strong>
+          <small>atendimientos</small>
+          <button class="reset-button" id="resetToday" type="button">↺ Resetear hoy</button>
+        </div>
+      </section>
+
+      <section class="metrics-grid" aria-label="Contadores de atendimientos">
+        <article class="metric-card fiber-card">
+          <div class="metric-heading">
+            <div class="metric-icon fiber-icon" aria-hidden="true">⌁</div>
+            <span class="metric-tag">INTERNET</span>
+          </div>
+          <h3>Fibras</h3>
+          <div class="metric-bottom">
+            <strong id="fiberCount">0</strong>
+            <button class="add-button fiber-button" data-type="fiber" type="button">
+              <span>+</span> Registrar
+            </button>
+          </div>
+        </article>
+        <article class="metric-card phone-card">
+          <div class="metric-heading">
+            <div class="metric-icon phone-icon" aria-hidden="true">⌕</div>
+            <span class="metric-tag">TELEFONÍA</span>
+          </div>
+          <h3>Líneas de teléfono</h3>
+          <div class="metric-bottom">
+            <strong id="phoneCount">0</strong>
+            <button class="add-button phone-button" data-type="phone" type="button">
+              <span>+</span> Registrar
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <div class="content-grid">
+        <section class="panel history-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">ACTIVIDAD</p>
+              <h2>Historial diario</h2>
+            </div>
+            <button class="text-button" id="clearHistory" type="button">Limpiar historial</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Fibras</th>
+                  <th>Teléfonos</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+            <div class="empty-state" id="emptyHistory">
+              <div class="empty-icon">◷</div>
+              <p>Aún no hay registros</p>
+              <span>Usa los botones superiores para iniciar tu jornada.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel alarms-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">ORGANIZACIÓN</p>
+              <h2>Pausas y alarmas</h2>
+            </div>
+            <span class="alarm-limit">0 / 8 activas</span>
+          </div>
+          <p class="panel-description">Configura hasta 8 recordatorios silenciosos para cuidar tu ritmo de trabajo.</p>
+          <div class="permission-banner" id="permissionBanner" hidden>
+            <span id="permissionText"></span>
+            <button type="button" id="permissionButton">Permitir notificaciones</button>
+          </div>
+          <div class="alarm-list" id="alarmList"></div>
+        </section>
+      </div>
+    </main>
+
+    <div class="notification-stack" id="notificationStack" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
