@@ -20,6 +20,7 @@ const notesList = document.querySelector("#notesList");
 const emptyNotes = document.querySelector("#emptyNotes");
 const noteForm = document.querySelector("#noteForm");
 const notesCount = document.querySelector("#notesCount");
+const noteStatus = document.querySelector("#noteStatus");
 let audioContext;
 
 function localDateKey(date = new Date()) {
@@ -316,19 +317,44 @@ document.querySelector("#clearHistory").addEventListener("click", () => {
 monthSelector.value = currentMonthKey();
 monthSelector.addEventListener("change", renderMonthlyDashboard);
 
-noteForm.addEventListener("submit", (event) => {
+noteForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const title = document.querySelector("#noteTitle").value.trim();
   const content = document.querySelector("#noteContent").value.trim();
   if (!title || !content) return;
-  state.notes.push({
+  const submitButton = noteForm.querySelector("button[type='submit']");
+  submitButton.disabled = true;
+  noteStatus.className = "note-status";
+  noteStatus.textContent = "Enviando nota a Discord...";
+  const note = {
     id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     title,
     content,
     createdAt: new Date().toISOString(),
-  });
-  saveState();
-  noteForm.reset();
+  };
+
+  try {
+    const response = await fetch("/api/discord-note", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: note.title, content: note.content, createdAt: note.createdAt }),
+    });
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      throw new Error(result.error || "Discord no pudo recibir la nota.");
+    }
+    state.notes.push(note);
+    noteStatus.className = "note-status success";
+    noteStatus.textContent = "Nota guardada y enviada a Discord.";
+  } catch (error) {
+    state.notes.push(note);
+    noteStatus.className = "note-status error";
+    noteStatus.textContent = `Nota guardada localmente, pero no se pudo enviar: ${error.message}`;
+  } finally {
+    saveState();
+    noteForm.reset();
+    submitButton.disabled = false;
+  }
   renderNotes();
 });
 

@@ -94,6 +94,10 @@ h1 span, em { color: var(--blue); font-style: normal; }
 .note-form input:focus, .note-form textarea:focus { border-color: #3974bd; }
 .add-note-button { padding: 0 14px; border: 1px solid #31568a; border-radius: 8px; background: var(--blue-soft); color: var(--blue); font-size: 12px; font-weight: 600; }
 .add-note-button:hover { background: rgba(63, 139, 255, 0.2); }
+.add-note-button:disabled { cursor: wait; opacity: 0.6; }
+.note-status { min-height: 16px; margin: 10px 0 0; color: var(--muted); font-size: 11px; }
+.note-status.success { color: var(--green); }
+.note-status.error { color: var(--orange); }
 .notes-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; margin-top: 16px; }
 .note-card { position: relative; padding: 13px 38px 13px 14px; border: 1px solid var(--border); border-radius: 9px; background: rgba(9, 13, 19, 0.42); }
 .note-card strong { display: block; margin-bottom: 5px; color: var(--text); font-size: 12px; }

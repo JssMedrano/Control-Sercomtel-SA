@@ -162,8 +162,9 @@
         <form class="note-form" id="noteForm">
           <input id="noteTitle" type="text" maxlength="60" placeholder="Título de la nota" aria-label="Título de la nota" required />
           <textarea id="noteContent" maxlength="300" placeholder="Escribe aquí una información importante..." aria-label="Contenido de la nota" required></textarea>
-          <button class="add-note-button" type="submit">Guardar nota</button>
+          <button class="add-note-button" type="submit">Guardar y enviar</button>
         </form>
+        <p class="note-status" id="noteStatus" aria-live="polite"></p>
         <div class="notes-list" id="notesList"></div>
         <div class="empty-notes" id="emptyNotes">Todavía no has guardado ninguna nota.</div>
       </section>
