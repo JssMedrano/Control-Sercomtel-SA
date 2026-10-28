@@ -49,6 +49,17 @@ Obs: Cliente entrou em contato para solicitar o cancelamento do serviço, inform
 *Ciente devolução/ Proporcional/ Geradocs / Multa`,
   },
 ];
+let customScripts = loadCustomScripts();
+
+function loadCustomScripts() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(`${STORAGE_KEY}-scripts`));
+    return Array.isArray(saved) ? saved.filter((script) => script && script.title && script.text) : [];
+  } catch (error) {
+    console.error("No se pudieron cargar los scripts personalizados.", error);
+    return [];
+  }
+}
 
 function localDateKey(date = new Date()) {
   const offset = date.getTimezoneOffset() * 60000;
@@ -239,19 +250,36 @@ function renderNotes() {
 }
 
 function renderScripts() {
-  scriptsList.innerHTML = serviceScripts.map((script, index) => `
+  const builtInMarkup = serviceScripts.map((script, index) => `
     <details class="script-card">
       <summary><strong>${script.title}</strong><span>+</span></summary>
       <div class="script-body">
-        <pre>${script.text}</pre>
+        <pre></pre>
         <button class="copy-script" type="button" data-script-index="${index}">Copiar script</button>
       </div>
     </details>
   `).join("");
+  const customMarkup = customScripts.map((script, index) => `
+    <details class="script-card custom-script-card">
+      <summary><strong></strong><span>+</span></summary>
+      <div class="script-body">
+        <pre></pre>
+        <div class="script-card-actions">
+          <button class="copy-script" type="button" data-custom-script-index="${index}">Copiar script</button>
+          <button class="delete-script" type="button" data-custom-script-delete="${index}">Eliminar</button>
+        </div>
+      </div>
+    </details>
+  `).join("");
+  scriptsList.innerHTML = builtInMarkup + customMarkup;
+  scriptsList.querySelectorAll(".script-card").forEach((card, index) => {
+    const script = index < serviceScripts.length ? serviceScripts[index] : customScripts[index - serviceScripts.length];
+    card.querySelector("strong").textContent = script.title;
+    card.querySelector("pre").textContent = script.text;
+  });
 }
 
-async function copyScript(index, button) {
-  const text = serviceScripts[index].text;
+async function copyScript(text, button) {
   try {
     await navigator.clipboard.writeText(text);
   } catch (error) {
@@ -496,9 +524,44 @@ notesList.addEventListener("click", (event) => {
 });
 
 scriptsList.addEventListener("click", (event) => {
+  const customCopyButton = event.target.closest("[data-custom-script-index]");
+  if (customCopyButton) {
+    copyScript(customScripts[Number(customCopyButton.dataset.customScriptIndex)].text, customCopyButton);
+    return;
+  }
+  const deleteButton = event.target.closest("[data-custom-script-delete]");
+  if (deleteButton) {
+    customScripts.splice(Number(deleteButton.dataset.customScriptDelete), 1);
+    localStorage.setItem(`${STORAGE_KEY}-scripts`, JSON.stringify(customScripts));
+    renderScripts();
+    return;
+  }
   const button = event.target.closest(".copy-script");
   if (!button) return;
-  copyScript(Number(button.dataset.scriptIndex), button);
+  copyScript(serviceScripts[Number(button.dataset.scriptIndex)].text, button);
+});
+
+document.querySelector("#toggleScriptForm").addEventListener("click", () => {
+  const form = document.querySelector("#customScriptForm");
+  form.hidden = !form.hidden;
+  if (!form.hidden) document.querySelector("#scriptTitle").focus();
+});
+
+document.querySelector("#cancelScript").addEventListener("click", () => {
+  document.querySelector("#customScriptForm").reset();
+  document.querySelector("#customScriptForm").hidden = true;
+});
+
+document.querySelector("#customScriptForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const title = document.querySelector("#scriptTitle").value.trim();
+  const text = document.querySelector("#scriptContent").value.trim();
+  if (!title || !text) return;
+  customScripts.push({ title, text });
+  localStorage.setItem(`${STORAGE_KEY}-scripts`, JSON.stringify(customScripts));
+  event.currentTarget.reset();
+  event.currentTarget.hidden = true;
+  renderScripts();
 });
 
 document.querySelector("#resetToday").addEventListener("click", () => {

@@ -97,7 +97,20 @@ h1 span, em { color: var(--red); font-style: italic; }
 .alarm-content { margin-top: 20px; }
 .scripts-panel { margin-top: 16px; }
 .scripts-hint { color: var(--faint); font-size: 11px; }
+.add-script-button { padding: 8px 11px; border: 1px solid #4d1f24; border-radius: 7px; background: rgba(255, 38, 50, 0.07); color: var(--red); font-size: 11px; font-weight: 700; }
+.add-script-button:hover { background: rgba(255, 38, 50, 0.15); }
+.custom-script-form { display: grid; gap: 9px; margin-top: 18px; padding: 14px; border: 1px solid var(--border); background: #050505; }
+.custom-script-form[hidden] { display: none; }
+.custom-script-form input, .custom-script-form textarea { width: 100%; padding: 10px 11px; border: 1px solid var(--border); outline: 0; background: #000; color: var(--text); font-size: 12px; }
+.custom-script-form textarea { min-height: 100px; resize: vertical; }
+.custom-script-form input:focus, .custom-script-form textarea:focus { border-color: var(--red); }
+.custom-script-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
 .scripts-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
+.custom-script-card { border-color: #4d1f24; }
+.script-card-actions { display: flex; gap: 8px; margin-top: 14px; }
+.script-card-actions .copy-script { margin-top: 0; }
+.delete-script { flex: 0 0 auto; padding: 9px 10px; border: 1px solid var(--border); background: transparent; color: var(--faint); font-size: 11px; }
+.delete-script:hover { border-color: var(--red); color: var(--red); }
 .script-card { border: 1px solid var(--border); background: #050505; }
 .script-card summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; cursor: pointer; list-style: none; }
 .script-card summary::-webkit-details-marker { display: none; }

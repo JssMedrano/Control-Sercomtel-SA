@@ -175,8 +175,16 @@
             <p class="eyebrow">ATENCIÓN</p>
             <h2>Scripts de atendimiento</h2>
           </div>
-          <span class="scripts-hint">Copia con un clic</span>
+          <button class="add-script-button" id="toggleScriptForm" type="button">+ Nuevo script</button>
         </div>
+        <form class="custom-script-form" id="customScriptForm" hidden>
+          <input id="scriptTitle" type="text" maxlength="60" placeholder="Nombre del script" aria-label="Nombre del script" required />
+          <textarea id="scriptContent" maxlength="2000" placeholder="Escribe el contenido del script..." aria-label="Contenido del script" required></textarea>
+          <div class="custom-script-actions">
+            <button class="text-button" id="cancelScript" type="button">Cancelar</button>
+            <button class="add-note-button" type="submit">Guardar script</button>
+          </div>
+        </form>
         <div class="scripts-list" id="scriptsList"></div>
       </section>
 
