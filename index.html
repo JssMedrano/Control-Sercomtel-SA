@@ -69,6 +69,42 @@
         </article>
       </section>
 
+      <section class="panel analytics-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">ANÁLISIS</p>
+            <h2>Dashboard mensual</h2>
+          </div>
+          <label class="month-picker">
+            <span>Mes</span>
+            <input id="monthSelector" type="month" />
+          </label>
+        </div>
+        <div class="analytics-summary">
+          <div class="summary-item">
+            <span>Total del mes</span>
+            <strong id="monthlyTotal">0</strong>
+            <small>atendimientos</small>
+          </div>
+          <div class="summary-item">
+            <span>Media diaria</span>
+            <strong id="dailyAverage">0</strong>
+            <small>por día registrado</small>
+          </div>
+          <div class="summary-item">
+            <span>Días registrados</span>
+            <strong id="registeredDays">0</strong>
+            <small>este mes</small>
+          </div>
+          <div class="summary-item">
+            <span>Distribución</span>
+            <strong id="monthlySplit">0 / 0</strong>
+            <small>fibras / teléfonos</small>
+          </div>
+        </div>
+        <div class="chart" id="monthlyChart" aria-label="Atendimientos por día"></div>
+      </section>
+
       <div class="content-grid">
         <section class="panel history-panel">
           <div class="panel-header">
@@ -114,6 +150,23 @@
           <div class="alarm-list" id="alarmList"></div>
         </section>
       </div>
+
+      <section class="panel notes-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">REGISTRO PERSONAL</p>
+            <h2>Información importante</h2>
+          </div>
+          <span class="notes-count" id="notesCount">0 registros</span>
+        </div>
+        <form class="note-form" id="noteForm">
+          <input id="noteTitle" type="text" maxlength="60" placeholder="Título de la nota" aria-label="Título de la nota" required />
+          <textarea id="noteContent" maxlength="300" placeholder="Escribe aquí una información importante..." aria-label="Contenido de la nota" required></textarea>
+          <button class="add-note-button" type="submit">Guardar nota</button>
+        </form>
+        <div class="notes-list" id="notesList"></div>
+        <div class="empty-notes" id="emptyNotes">Todavía no has guardado ninguna nota.</div>
+      </section>
     </main>
 
     <div class="notification-stack" id="notificationStack" aria-live="polite"></div>

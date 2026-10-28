@@ -14,6 +14,12 @@ const permissionBanner = document.querySelector("#permissionBanner");
 const permissionText = document.querySelector("#permissionText");
 const permissionButton = document.querySelector("#permissionButton");
 const alarmWorker = new Worker("alarm-worker.js");
+const monthSelector = document.querySelector("#monthSelector");
+const monthlyChart = document.querySelector("#monthlyChart");
+const notesList = document.querySelector("#notesList");
+const emptyNotes = document.querySelector("#emptyNotes");
+const noteForm = document.querySelector("#noteForm");
+const notesCount = document.querySelector("#notesCount");
 let audioContext;
 
 function localDateKey(date = new Date()) {
@@ -33,6 +39,7 @@ function loadState() {
     if (saved && typeof saved === "object") {
       return {
         days: saved.days || {},
+        notes: Array.isArray(saved.notes) ? saved.notes : [],
         alarms: Array.from({ length: alarmCount }, (_, index) => ({
           time: saved.alarms?.[index]?.time || "",
           label: saved.alarms?.[index]?.label || `Pausa ${index + 1}`,
@@ -45,6 +52,7 @@ function loadState() {
   }
   return {
     days: {},
+    notes: [],
     alarms: Array.from({ length: alarmCount }, (_, index) => ({
       time: "",
       label: `Pausa ${index + 1}`,
@@ -79,6 +87,59 @@ function renderDashboard() {
     </tr>
   `).join("");
   emptyHistory.hidden = days.length > 0;
+  renderMonthlyDashboard();
+  renderNotes();
+}
+
+function currentMonthKey() {
+  return localDateKey().slice(0, 7);
+}
+
+function renderMonthlyDashboard() {
+  const month = monthSelector.value || currentMonthKey();
+  const monthDays = Object.entries(state.days)
+    .filter(([date]) => date.startsWith(month))
+    .sort(([first], [second]) => first.localeCompare(second));
+  const totals = monthDays.reduce((result, [, counts]) => ({
+    fiber: result.fiber + counts.fiber,
+    phone: result.phone + counts.phone,
+  }), { fiber: 0, phone: 0 });
+  const total = totals.fiber + totals.phone;
+
+  document.querySelector("#monthlyTotal").textContent = total;
+  document.querySelector("#dailyAverage").textContent = monthDays.length ? (total / monthDays.length).toFixed(1) : "0";
+  document.querySelector("#registeredDays").textContent = monthDays.length;
+  document.querySelector("#monthlySplit").textContent = `${totals.fiber} / ${totals.phone}`;
+
+  const maxTotal = Math.max(...monthDays.map(([, counts]) => counts.fiber + counts.phone), 1);
+  monthlyChart.innerHTML = monthDays.length ? monthDays.map(([date, counts]) => {
+    const dayTotal = counts.fiber + counts.phone;
+    const height = Math.max((dayTotal / maxTotal) * 100, 3);
+    return `<div class="chart-column" title="${formatDate(date)}: ${dayTotal} atendimientos">
+      <div class="chart-bar" style="height: ${height}%"></div>
+      <span>${Number(date.slice(8))}</span>
+    </div>`;
+  }).join("") : `<div class="empty-chart">No hay atendimientos registrados en este mes.</div>`;
+}
+
+function renderNotes() {
+  const notes = [...state.notes].sort((first, second) => second.createdAt.localeCompare(first.createdAt));
+  notesCount.textContent = `${notes.length} ${notes.length === 1 ? "registro" : "registros"}`;
+  emptyNotes.hidden = notes.length > 0;
+  notesList.innerHTML = "";
+  notes.forEach((note) => {
+    const card = document.createElement("article");
+    card.className = "note-card";
+    card.innerHTML = `<button class="delete-note" type="button" data-note-id="${note.id}" aria-label="Eliminar nota">×</button>`;
+    const title = document.createElement("strong");
+    title.textContent = note.title;
+    const content = document.createElement("p");
+    content.textContent = note.content;
+    const date = document.createElement("time");
+    date.textContent = formatDate(note.createdAt.slice(0, 10));
+    card.append(title, content, date);
+    notesList.append(card);
+  });
 }
 
 function renderAlarms() {
@@ -250,6 +311,33 @@ document.querySelector("#clearHistory").addEventListener("click", () => {
     saveState();
     renderDashboard();
   }
+});
+
+monthSelector.value = currentMonthKey();
+monthSelector.addEventListener("change", renderMonthlyDashboard);
+
+noteForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const title = document.querySelector("#noteTitle").value.trim();
+  const content = document.querySelector("#noteContent").value.trim();
+  if (!title || !content) return;
+  state.notes.push({
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    title,
+    content,
+    createdAt: new Date().toISOString(),
+  });
+  saveState();
+  noteForm.reset();
+  renderNotes();
+});
+
+notesList.addEventListener("click", (event) => {
+  const button = event.target.closest(".delete-note");
+  if (!button) return;
+  state.notes = state.notes.filter((note) => note.id !== button.dataset.noteId);
+  saveState();
+  renderNotes();
 });
 
 document.querySelector("#resetToday").addEventListener("click", () => {
