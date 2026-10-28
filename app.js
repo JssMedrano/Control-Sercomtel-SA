@@ -13,6 +13,7 @@ const notificationStack = document.querySelector("#notificationStack");
 const permissionBanner = document.querySelector("#permissionBanner");
 const permissionText = document.querySelector("#permissionText");
 const permissionButton = document.querySelector("#permissionButton");
+const alarmWorker = new Worker("alarm-worker.js");
 
 function localDateKey(date = new Date()) {
   const offset = date.getTimezoneOffset() * 60000;
@@ -143,24 +144,33 @@ async function requestNotificationPermission() {
   return permission === "granted";
 }
 
-function checkAlarms() {
-  const now = new Date();
-  const currentTime = now.toTimeString().slice(0, 5);
-  const todayKey = localDateKey(now);
-  state.alarms.forEach((alarm, index) => {
-    if (alarm.enabled && alarm.time === currentTime && alarm.lastTriggered !== todayKey) {
-      alarm.lastTriggered = todayKey;
-      saveState();
-      showNotification(alarm.label || `Pausa ${index + 1}`);
-      if ("Notification" in window && Notification.permission === "granted") {
-        new Notification("Momento de tu pausa", {
-          body: alarm.label || `Pausa ${index + 1}`,
-          tag: `retention-break-${index}`,
-        });
-      }
-    }
+function syncAlarmsWithWorker() {
+  alarmWorker.postMessage({
+    type: "sync",
+    alarms: state.alarms.map(({ time, label, enabled }) => ({ time, label, enabled })),
   });
 }
+
+alarmWorker.addEventListener("message", (event) => {
+  if (event.data?.type !== "alarm") return;
+  const { index, label, dateKey } = event.data;
+  const alarm = state.alarms[index];
+  if (!alarm || alarm.lastTriggered === dateKey) return;
+
+  alarm.lastTriggered = dateKey;
+  saveState();
+  showNotification(label || `Pausa ${index + 1}`);
+  if ("Notification" in window && Notification.permission === "granted") {
+    new Notification("Momento de tu pausa", {
+      body: label || `Pausa ${index + 1}`,
+      tag: `retention-break-${index}`,
+    });
+  }
+});
+
+alarmWorker.addEventListener("error", (event) => {
+  console.error("No se pudo iniciar el reloj de alarmas.", event.error || event.message);
+});
 
 document.querySelectorAll(".add-button").forEach((button) => {
   button.addEventListener("click", () => addCount(button.dataset.type));
@@ -183,12 +193,14 @@ alarmList.addEventListener("input", (event) => {
       state.alarms[index].enabled = true;
       saveState();
       renderAlarms();
+      syncAlarmsWithWorker();
     });
     return;
   }
   state.alarms[index][field] = target.type === "checkbox" ? target.checked : target.value;
   saveState();
   if (field === "enabled" || field === "time") renderAlarms();
+  syncAlarmsWithWorker();
 });
 
 permissionButton.addEventListener("click", requestNotificationPermission);
@@ -216,4 +228,4 @@ document.querySelector("#resetToday").addEventListener("click", () => {
 renderDashboard();
 renderAlarms();
 updatePermissionBanner();
-setInterval(checkAlarms, 1000);
+syncAlarmsWithWorker();
