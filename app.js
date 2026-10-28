@@ -22,7 +22,33 @@ const noteForm = document.querySelector("#noteForm");
 const notesCount = document.querySelector("#notesCount");
 const noteStatus = document.querySelector("#noteStatus");
 const reportStatus = document.querySelector("#reportStatus");
+const scriptsList = document.querySelector("#scriptsList");
 let audioContext;
+
+const serviceScripts = [
+  {
+    title: "Cliente no es titular",
+    text: "Cliente entrou em contato porém não é titular do serviço. Orientado que apenas o titular poderá realizar o contato.",
+  },
+  {
+    title: "Cancelamiento por no utilización",
+    text: `Motivo: Não Utiliza
+Cod: 78
+Oferta Conc: N/a
+Oferta Ret: Troca de Titularidade/ ME
+Obs: Cliente entrou em contato para solicitar o cancelamento do serviço. Informo que não faz utilização do serviço. Não aceita ofertas de retenção.
+*Ciente devolução/ Proporcional/ Geradocs / Multa`,
+  },
+  {
+    title: "Cancelamiento por óbito",
+    text: `Motivo: Obito
+Cod: 57
+Oferta Conc: N/a
+Oferta Ret: Troca de Titularidade/ ME
+Obs: Cliente entrou em contato para solicitar o cancelamento do serviço, informo que por motivo de óbito do titular. Não aceita ofertas de retenção. Irá encaminhar documentos no sac.cancela@sercomtel.net.br.
+*Ciente devolução/ Proporcional/ Geradocs / Multa`,
+  },
+];
 
 function localDateKey(date = new Date()) {
   const offset = date.getTimezoneOffset() * 60000;
@@ -210,6 +236,34 @@ function renderNotes() {
     card.append(title, content, date);
     notesList.append(card);
   });
+}
+
+function renderScripts() {
+  scriptsList.innerHTML = serviceScripts.map((script, index) => `
+    <details class="script-card">
+      <summary><strong>${script.title}</strong><span>+</span></summary>
+      <div class="script-body">
+        <pre>${script.text}</pre>
+        <button class="copy-script" type="button" data-script-index="${index}">Copiar script</button>
+      </div>
+    </details>
+  `).join("");
+}
+
+async function copyScript(index, button) {
+  const text = serviceScripts[index].text;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (error) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.append(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    textArea.remove();
+  }
+  button.textContent = "Script copiado";
+  setTimeout(() => { button.textContent = "Copiar script"; }, 1600);
 }
 
 function renderAlarms() {
@@ -441,6 +495,12 @@ notesList.addEventListener("click", (event) => {
   renderNotes();
 });
 
+scriptsList.addEventListener("click", (event) => {
+  const button = event.target.closest(".copy-script");
+  if (!button) return;
+  copyScript(Number(button.dataset.scriptIndex), button);
+});
+
 document.querySelector("#resetToday").addEventListener("click", () => {
   const todayKey = localDateKey();
   const today = state.days[todayKey];
@@ -454,6 +514,7 @@ document.querySelector("#resetToday").addEventListener("click", () => {
 
 renderDashboard();
 renderAlarms();
+renderScripts();
 updatePermissionBanner();
 syncAlarmsWithWorker();
 setInterval(checkScheduledReports, 30000);

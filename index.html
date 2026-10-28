@@ -149,21 +149,36 @@
         </section>
 
         <section class="panel alarms-panel">
-          <div class="panel-header">
-            <div>
-              <p class="eyebrow">ORGANIZACIÓN</p>
-              <h2>Pausas y alarmas</h2>
+          <details class="alarm-details">
+            <summary>
+              <span>
+                <span class="eyebrow">ORGANIZACIÓN</span>
+                <strong>Pausas y alarmas</strong>
+              </span>
+              <span class="alarm-summary-meta"><span class="alarm-limit">0 / 8 activas</span><span class="summary-chevron">+</span></span>
+            </summary>
+            <div class="alarm-content">
+              <p class="panel-description">Configura hasta 8 recordatorios silenciosos para cuidar tu ritmo de trabajo.</p>
+              <div class="permission-banner" id="permissionBanner" hidden>
+                <span id="permissionText"></span>
+                <button type="button" id="permissionButton">Permitir notificaciones</button>
+              </div>
+              <div class="alarm-list" id="alarmList"></div>
             </div>
-            <span class="alarm-limit">0 / 8 activas</span>
-          </div>
-          <p class="panel-description">Configura hasta 8 recordatorios silenciosos para cuidar tu ritmo de trabajo.</p>
-          <div class="permission-banner" id="permissionBanner" hidden>
-            <span id="permissionText"></span>
-            <button type="button" id="permissionButton">Permitir notificaciones</button>
-          </div>
-          <div class="alarm-list" id="alarmList"></div>
+          </details>
         </section>
       </div>
+
+      <section class="panel scripts-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">ATENCIÓN</p>
+            <h2>Scripts de atendimiento</h2>
+          </div>
+          <span class="scripts-hint">Copia con un clic</span>
+        </div>
+        <div class="scripts-list" id="scriptsList"></div>
+      </section>
 
       <section class="panel notes-panel">
         <div class="panel-header">
