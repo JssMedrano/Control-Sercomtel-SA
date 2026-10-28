@@ -23,6 +23,10 @@ const notesCount = document.querySelector("#notesCount");
 const noteStatus = document.querySelector("#noteStatus");
 const reportStatus = document.querySelector("#reportStatus");
 const scriptsList = document.querySelector("#scriptsList");
+const workSaturday = document.querySelector("#workSaturday");
+const workSaturdayEnabled = document.querySelector("#workSaturdayEnabled");
+const reminderStatus = document.querySelector("#reminderStatus");
+const saturdayReminderText = document.querySelector("#saturdayReminderText");
 let audioContext;
 
 const serviceScripts = [
@@ -66,6 +70,54 @@ function localDateKey(date = new Date()) {
   return new Date(date.getTime() - offset).toISOString().slice(0, 10);
 }
 
+function dateKeyFromDate(date) {
+  return localDateKey(date);
+}
+
+function getThursdayBefore(saturdayDate) {
+  const date = new Date(`${saturdayDate}T12:00:00`);
+  date.setDate(date.getDate() - 2);
+  return dateKeyFromDate(date);
+}
+
+function renderSaturdayReminder() {
+  workSaturday.value = state.saturdayReminder.saturdayDate;
+  workSaturdayEnabled.checked = state.saturdayReminder.enabled;
+  saturdayReminderText.textContent = state.saturdayReminder.saturdayDate
+    ? `Aviso el jueves anterior a las ${state.saturdayReminder.time}.`
+    : "Selecciona el sábado en el que trabajarás.";
+}
+
+function updateSaturdayReminder() {
+  const selectedDate = workSaturday.value;
+  if (!selectedDate) {
+    state.saturdayReminder.saturdayDate = "";
+    state.saturdayReminder.thursdayDate = "";
+    state.saturdayReminder.enabled = false;
+    reminderStatus.textContent = "Selecciona una fecha para activar el recordatorio.";
+    reminderStatus.className = "reminder-status";
+  } else {
+    const selected = new Date(`${selectedDate}T12:00:00`);
+    if (selected.getDay() !== 6) {
+      state.saturdayReminder.enabled = false;
+      state.saturdayReminder.lastTriggered = "";
+      workSaturdayEnabled.checked = false;
+      reminderStatus.textContent = "Elige un sábado para configurar este recordatorio.";
+      reminderStatus.className = "reminder-status error";
+    } else {
+      state.saturdayReminder.saturdayDate = selectedDate;
+      state.saturdayReminder.thursdayDate = getThursdayBefore(selectedDate);
+      state.saturdayReminder.enabled = workSaturdayEnabled.checked;
+      state.saturdayReminder.lastTriggered = "";
+      reminderStatus.textContent = `Recordatorio programado para el jueves ${formatDate(state.saturdayReminder.thursdayDate)} a las 16:12.`;
+      reminderStatus.className = "reminder-status success";
+    }
+  }
+  saveState();
+  renderSaturdayReminder();
+  syncAlarmsWithWorker();
+}
+
 function formatDate(dateKey) {
   return new Intl.DateTimeFormat("es", { day: "2-digit", month: "short", year: "numeric" })
     .format(new Date(`${dateKey}T12:00:00`))
@@ -80,6 +132,13 @@ function loadState() {
         days: saved.days || {},
         notes: Array.isArray(saved.notes) ? saved.notes : [],
         reportSent: saved.reportSent || {},
+        saturdayReminder: {
+          saturdayDate: saved.saturdayReminder?.saturdayDate || "",
+          thursdayDate: saved.saturdayReminder?.thursdayDate || "",
+          time: saved.saturdayReminder?.time || "16:12",
+          enabled: Boolean(saved.saturdayReminder?.enabled),
+          lastTriggered: saved.saturdayReminder?.lastTriggered || "",
+        },
         alarms: Array.from({ length: alarmCount }, (_, index) => ({
           time: saved.alarms?.[index]?.time || "",
           label: saved.alarms?.[index]?.label || `Pausa ${index + 1}`,
@@ -94,6 +153,13 @@ function loadState() {
     days: {},
     notes: [],
     reportSent: {},
+    saturdayReminder: {
+      saturdayDate: "",
+      thursdayDate: "",
+      time: "16:12",
+      enabled: false,
+      lastTriggered: "",
+    },
     alarms: Array.from({ length: alarmCount }, (_, index) => ({
       time: "",
       label: `Pausa ${index + 1}`,
@@ -250,9 +316,16 @@ function renderNotes() {
 }
 
 function renderScripts() {
+  const escapeHtml = (value) => value.replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  }[character]));
   const builtInMarkup = serviceScripts.map((script, index) => `
     <details class="script-card">
-      <summary><strong>${script.title}</strong><span>+</span></summary>
+      <summary><strong>${escapeHtml(script.title)}</strong><span>+</span></summary>
       <div class="script-body">
         <pre></pre>
         <button class="copy-script" type="button" data-script-index="${index}">Copiar script</button>
@@ -261,7 +334,7 @@ function renderScripts() {
   `).join("");
   const customMarkup = customScripts.map((script, index) => `
     <details class="script-card custom-script-card">
-      <summary><strong></strong><span>+</span></summary>
+      <summary><strong>${escapeHtml(script.title)}</strong><span>+</span></summary>
       <div class="script-body">
         <pre></pre>
         <div class="script-card-actions">
@@ -274,7 +347,6 @@ function renderScripts() {
   scriptsList.innerHTML = builtInMarkup + customMarkup;
   scriptsList.querySelectorAll(".script-card").forEach((card, index) => {
     const script = index < serviceScripts.length ? serviceScripts[index] : customScripts[index - serviceScripts.length];
-    card.querySelector("strong").textContent = script.title;
     card.querySelector("pre").textContent = script.text;
   });
 }
@@ -388,10 +460,26 @@ function syncAlarmsWithWorker() {
   alarmWorker.postMessage({
     type: "sync",
     alarms: state.alarms.map(({ time, label, enabled }) => ({ time, label, enabled })),
+    saturdayReminder: state.saturdayReminder,
   });
 }
 
 alarmWorker.addEventListener("message", (event) => {
+  if (event.data?.type === "saturday-reminder") {
+    if (state.saturdayReminder.lastTriggered === event.data.dateKey) return;
+    state.saturdayReminder.lastTriggered = event.data.dateKey;
+    saveState();
+    showNotification(event.data.label);
+    playAlarmBeep();
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Recordatorio de jornada", {
+        body: event.data.label,
+        tag: "retention-saturday-reminder",
+        silent: true,
+      });
+    }
+    return;
+  }
   if (event.data?.type !== "alarm") return;
   const { index, label, dateKey } = event.data;
   const alarm = state.alarms[index];
@@ -447,6 +535,23 @@ alarmList.addEventListener("input", (event) => {
   saveState();
   if (field === "enabled" || field === "time") renderAlarms();
   syncAlarmsWithWorker();
+});
+
+workSaturday.addEventListener("change", updateSaturdayReminder);
+
+workSaturdayEnabled.addEventListener("change", () => {
+  if (workSaturdayEnabled.checked && (!("Notification" in window) || Notification.permission !== "granted")) {
+    requestNotificationPermission().then((granted) => {
+      if (!granted) {
+        workSaturdayEnabled.checked = false;
+        updateSaturdayReminder();
+        return;
+      }
+      updateSaturdayReminder();
+    });
+    return;
+  }
+  updateSaturdayReminder();
 });
 
 permissionButton.addEventListener("click", () => {
@@ -578,6 +683,7 @@ document.querySelector("#resetToday").addEventListener("click", () => {
 renderDashboard();
 renderAlarms();
 renderScripts();
+renderSaturdayReminder();
 updatePermissionBanner();
 syncAlarmsWithWorker();
 setInterval(checkScheduledReports, 30000);

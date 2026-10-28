@@ -163,6 +163,21 @@
                 <span id="permissionText"></span>
                 <button type="button" id="permissionButton">Permitir notificaciones</button>
               </div>
+              <div class="work-saturday">
+                <div>
+                  <p class="eyebrow">RECORDATORIO MENSUAL</p>
+                  <strong>Sábado trabajado</strong>
+                  <span id="saturdayReminderText">Selecciona el sábado en el que trabajarás.</span>
+                </div>
+                <div class="saturday-controls">
+                  <input id="workSaturday" type="date" aria-label="Sábado trabajado" />
+                  <label class="switch" title="Activar recordatorio del sábado">
+                    <input id="workSaturdayEnabled" type="checkbox" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+              <p class="reminder-status" id="reminderStatus" aria-live="polite"></p>
               <div class="alarm-list" id="alarmList"></div>
             </div>
           </details>

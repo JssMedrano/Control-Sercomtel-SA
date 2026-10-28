@@ -1,9 +1,11 @@
 let alarms = [];
+let saturdayReminder = null;
 let lastMinute = "";
 
 self.addEventListener("message", (event) => {
   if (event.data?.type === "sync") {
     alarms = event.data.alarms || [];
+    saturdayReminder = event.data.saturdayReminder || null;
   }
 });
 
@@ -20,6 +22,14 @@ function checkAlarms() {
       self.postMessage({ type: "alarm", index, label: alarm.label, dateKey });
     }
   });
+
+  if (saturdayReminder?.enabled && saturdayReminder.thursdayDate === dateKey && saturdayReminder.time === time) {
+    self.postMessage({
+      type: "saturday-reminder",
+      label: "Recuerda: este sábado tienes jornada laboral.",
+      dateKey,
+    });
+  }
 }
 
 checkAlarms();

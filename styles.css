@@ -95,6 +95,14 @@ h1 span, em { color: var(--red); font-style: italic; }
 .summary-chevron { display: grid; width: 25px; height: 25px; place-items: center; border: 1px solid var(--border); border-radius: 50%; color: var(--muted); font-size: 18px; transition: transform 0.2s; }
 .alarm-details[open] .summary-chevron { transform: rotate(45deg); color: var(--red); }
 .alarm-content { margin-top: 20px; }
+.work-saturday { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 16px; padding: 14px; border: 1px solid var(--border); background: #050505; }
+.work-saturday strong { display: block; margin-bottom: 4px; font-family: "Barlow Condensed"; font-size: 19px; font-style: italic; text-transform: uppercase; }
+.work-saturday span:not(.slider) { color: var(--faint); font-size: 11px; }
+.saturday-controls { display: flex; align-items: center; gap: 14px; }
+.saturday-controls input[type="date"] { padding: 8px; border: 1px solid var(--border); background: #000; color: var(--text); font-size: 11px; }
+.reminder-status { min-height: 16px; margin: -7px 0 14px; color: var(--muted); font-size: 11px; }
+.reminder-status.error { color: var(--orange); }
+.reminder-status.success { color: var(--green); }
 .scripts-panel { margin-top: 16px; }
 .scripts-hint { color: var(--faint); font-size: 11px; }
 .add-script-button { padding: 8px 11px; border: 1px solid #4d1f24; border-radius: 7px; background: rgba(255, 38, 50, 0.07); color: var(--red); font-size: 11px; font-weight: 700; }
@@ -229,4 +237,6 @@ td:last-child { color: var(--text); font-weight: 700; }
   .add-button { justify-content: center; }
   .topbar .live-status { font-size: 0; }
   .permission-banner { align-items: flex-start; flex-direction: column; }
+  .work-saturday { align-items: flex-start; flex-direction: column; }
+  .saturday-controls { width: 100%; justify-content: space-between; }
 }
