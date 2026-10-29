@@ -7,8 +7,31 @@ function isValidRecord(record) {
 }
 
 export default async function handler(request, response) {
+  if (request.method === "GET") {
+    if (!process.env.MONGODB_URI) {
+      return response.status(503).json({ error: "MongoDB no está configurado." });
+    }
+    let client;
+    try {
+      client = new MongoClient(process.env.MONGODB_URI);
+      await client.connect();
+      const records = await client
+        .db(process.env.MONGODB_DB || "retencion_sercomtel")
+        .collection("attendances")
+        .find({}, { projection: { _id: 0 } })
+        .sort({ date: -1, createdAt: -1 })
+        .toArray();
+      return response.status(200).json({ records });
+    } catch (error) {
+      console.error("No se pudieron consultar los atendimientos en MongoDB.", error);
+      return response.status(502).json({ error: "No se pudieron consultar los atendimientos." });
+    } finally {
+      if (client) await client.close();
+    }
+  }
+
   if (request.method !== "POST") {
-    response.setHeader("Allow", "POST");
+    response.setHeader("Allow", "GET, POST");
     return response.status(405).json({ error: "Método no permitido." });
   }
 

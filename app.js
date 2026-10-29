@@ -181,6 +181,30 @@ function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+function rebuildDaysFromAttendances() {
+  state.days = state.attendances.reduce((days, record) => {
+    if (!days[record.date]) days[record.date] = { fiber: 0, phone: 0 };
+    if (record.type === "fiber" || record.type === "phone") days[record.date][record.type] += 1;
+    return days;
+  }, {});
+}
+
+async function loadAttendancesFromDatabase() {
+  try {
+    const response = await fetch("/api/attendances");
+    const result = await response.json();
+    if (!response.ok || !Array.isArray(result.records)) {
+      throw new Error(result.error || "MongoDB no devolvió registros válidos.");
+    }
+    state.attendances = result.records.map((record) => ({ ...record, syncStatus: "sent" }));
+    rebuildDaysFromAttendances();
+    saveState();
+    renderDashboard();
+  } catch (error) {
+    console.error("No se pudieron cargar los atendimientos desde MongoDB.", error);
+  }
+}
+
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (character) => ({
     "&": "&amp;",
@@ -523,6 +547,7 @@ async function submitAttendance(status) {
       saveState();
       renderAttendanceRecords();
       attendanceStatus.textContent = "Atendimiento guardado en MongoDB.";
+      await loadAttendancesFromDatabase();
     }
   } catch (error) {
     console.error("El atendimiento quedó guardado localmente, pero no se sincronizó.", error);
@@ -890,6 +915,7 @@ document.querySelector("#resetToday").addEventListener("click", () => {
 });
 
 renderDashboard();
+loadAttendancesFromDatabase();
 renderAlarms();
 renderScripts();
 renderSaturdayReminder();
