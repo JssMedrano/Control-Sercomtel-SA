@@ -21,6 +21,20 @@
     <div class="network-texture" aria-hidden="true"></div>
     <div class="scanlines" aria-hidden="true"></div>
     <main class="app-shell animate__animated animate__fadeIn">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-mark" aria-hidden="true">R</div>
+          <span>RETENCIÓN</span>
+        </div>
+        <nav class="side-nav" aria-label="Navegación principal">
+          <button class="side-nav-item active" type="button" data-view="atendimientos"><span>＋</span> Atendimientos</button>
+          <button class="side-nav-item" type="button" data-view="dashboard"><span>▦</span> Dashboard</button>
+          <button class="side-nav-item" type="button" data-view="alarmas"><span>◷</span> Alarmas</button>
+          <button class="side-nav-item" type="button" data-view="scripts"><span>▤</span> Scripts</button>
+        </nav>
+        <div class="sidebar-footer">v1.0 · jornada activa</div>
+      </aside>
+      <div class="page-content">
       <header class="topbar">
         <div class="brand">
           <div class="brand-mark" aria-hidden="true">R</div>
@@ -32,7 +46,8 @@
         <div class="live-status"><span class="status-dot"></span> Jornada activa</div>
       </header>
 
-      <section class="hero">
+      <div class="view-section" data-view-section="atendimientos">
+      <section class="hero compact-hero">
         <div>
           <p class="eyebrow">RESUMEN DE HOY <span id="currentDate"></span></p>
           <h2>Tu jornada, <em>bajo control.</em></h2>
@@ -74,8 +89,34 @@
           </div>
         </article>
       </section>
+      <section class="intake-panel">
+        <div class="attendance-type-switch" role="group" aria-label="Tipo de atendimiento">
+          <button class="type-button active" type="button" data-attendance-type="fiber">Fibras</button>
+          <button class="type-button" type="button" data-attendance-type="phone">Líneas</button>
+        </div>
+        <div class="status-actions" role="group" aria-label="Estado del atendimiento">
+          <button class="status-button retained" type="button" data-status="retained">Retenido</button>
+          <button class="status-button cancelled" type="button" data-status="cancelled">Cancelado</button>
+          <button class="status-button pending" type="button" data-status="pending">Pendiente</button>
+        </div>
+        <form id="attendanceForm" class="attendance-form">
+          <div class="form-grid">
+            <label>Nome:<input name="name" autocomplete="off" /></label>
+            <label>Protocolo:<input name="protocol" autocomplete="off" /></label>
+            <label>Inscrição:<input name="registration" autocomplete="off" /></label>
+            <label>Contato:<input name="contact" autocomplete="off" /></label>
+            <label>CPF/CNPJ:<input name="document" autocomplete="off" /></label>
+            <label>VOX:<input name="vox" autocomplete="off" /></label>
+          </div>
+          <label class="notes-field">Anotaciones del atendimiento:
+            <textarea name="annotations" rows="3" placeholder="Escribe una observación..."></textarea>
+          </label>
+          <p class="attendance-status" id="attendanceStatus" aria-live="polite"></p>
+        </form>
+      </section>
+      </div>
 
-      <section class="panel analytics-panel">
+      <section class="panel analytics-panel view-section" data-view-section="dashboard">
         <div class="panel-header">
           <div>
             <p class="eyebrow">ANÁLISIS</p>
@@ -124,7 +165,7 @@
       </section>
 
       <div class="content-grid">
-        <section class="panel history-panel">
+        <section class="panel history-panel view-section" data-view-section="dashboard">
           <div class="panel-header">
             <div>
               <p class="eyebrow">ACTIVIDAD</p>
@@ -152,7 +193,7 @@
           </div>
         </section>
 
-        <section class="panel alarms-panel">
+        <section class="panel alarms-panel view-section" data-view-section="alarmas">
           <details class="alarm-details">
             <summary>
               <span>
@@ -189,7 +230,7 @@
         </section>
       </div>
 
-      <section class="panel scripts-panel">
+      <section class="panel scripts-panel view-section" data-view-section="scripts">
         <div class="panel-header">
           <div>
             <p class="eyebrow">ATENCIÓN</p>
@@ -208,7 +249,7 @@
         <div class="scripts-list" id="scriptsList"></div>
       </section>
 
-      <section class="panel notes-panel">
+      <section class="panel notes-panel view-section" data-view-section="scripts">
         <div class="panel-header">
           <div>
             <p class="eyebrow">REGISTRO PERSONAL</p>
@@ -228,6 +269,7 @@
         <div class="notes-list" id="notesList"></div>
         <div class="empty-notes" id="emptyNotes">Todavía no has guardado ninguna nota.</div>
       </section>
+      </div>
     </main>
 
     <div class="notification-stack" id="notificationStack" aria-live="polite"></div>

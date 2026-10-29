@@ -23,6 +23,10 @@ const notesCount = document.querySelector("#notesCount");
 const noteStatus = document.querySelector("#noteStatus");
 const reportStatus = document.querySelector("#reportStatus");
 const scriptsList = document.querySelector("#scriptsList");
+const attendanceForm = document.querySelector("#attendanceForm");
+const attendanceStatus = document.querySelector("#attendanceStatus");
+let selectedAttendanceStatus = "pending";
+let selectedAttendanceType = "fiber";
 const workSaturday = document.querySelector("#workSaturday");
 const workSaturdayEnabled = document.querySelector("#workSaturdayEnabled");
 const reminderStatus = document.querySelector("#reminderStatus");
@@ -130,6 +134,7 @@ function loadState() {
     if (saved && typeof saved === "object") {
       return {
         days: saved.days || {},
+        attendances: Array.isArray(saved.attendances) ? saved.attendances : [],
         notes: Array.isArray(saved.notes) ? saved.notes : [],
         reportSent: saved.reportSent || {},
         saturdayReminder: {
@@ -151,6 +156,7 @@ function loadState() {
   }
   return {
     days: {},
+    attendances: [],
     notes: [],
     reportSent: {},
     saturdayReminder: {
@@ -408,6 +414,45 @@ function addCount(type) {
   renderDashboard();
 }
 
+async function submitAttendance(status) {
+  const formData = new FormData(attendanceForm);
+  const fields = Object.fromEntries(formData.entries());
+  const hasData = Object.values(fields).some((value) => String(value).trim());
+  if (!hasData) {
+    attendanceStatus.textContent = "Completa al menos un campo antes de registrar.";
+    attendanceStatus.className = "attendance-status error";
+    return;
+  }
+  const record = {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    date: localDateKey(),
+    createdAt: new Date().toISOString(),
+    status,
+    ...fields,
+  };
+  state.attendances.push(record);
+  const counterType = selectedAttendanceType;
+  if (!state.days[record.date]) state.days[record.date] = { fiber: 0, phone: 0 };
+  state.days[record.date][counterType] += 1;
+  saveState();
+  renderDashboard();
+  attendanceForm.reset();
+  attendanceStatus.textContent = `Atendimiento ${status === "retained" ? "retenido" : status === "cancelled" ? "cancelado" : "pendiente"} registrado.`;
+  attendanceStatus.className = "attendance-status success";
+
+  try {
+    const response = await fetch("/api/attendances", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(record),
+    });
+    if (!response.ok) throw new Error("No se pudo sincronizar con la base de datos.");
+  } catch (error) {
+    console.error("El atendimiento quedó guardado localmente, pero no se sincronizó.", error);
+    attendanceStatus.textContent += " Guardado localmente; sincronización pendiente.";
+  }
+}
+
 function showNotification(message) {
   const notification = document.createElement("div");
   notification.className = "notification";
@@ -524,6 +569,36 @@ document.querySelectorAll(".add-button").forEach((button) => {
   button.addEventListener("click", () => {
     unlockAudio();
     addCount(button.dataset.type);
+  });
+
+  document.querySelectorAll(".status-button").forEach((button) => {
+    button.addEventListener("click", () => submitAttendance(button.dataset.status));
+  });
+
+  document.querySelectorAll(".type-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedAttendanceType = button.dataset.attendanceType;
+      document.querySelectorAll(".type-button").forEach((item) => item.classList.toggle("active", item === button));
+    });
+  });
+
+  attendanceForm.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" || event.shiftKey || event.target.matches("textarea")) return;
+    event.preventDefault();
+    submitAttendance(selectedAttendanceStatus);
+  });
+
+  document.querySelectorAll(".side-nav-item").forEach((button) => {
+    button.addEventListener("click", () => {
+      const view = button.dataset.view;
+      document.querySelectorAll(".side-nav-item").forEach((item) => item.classList.toggle("active", item === button));
+      document.querySelectorAll("[data-view-section]").forEach((section) => {
+        section.hidden = section.dataset.viewSection !== view;
+      });
+    });
+    document.querySelectorAll("[data-view-section]").forEach((section) => {
+      section.hidden = section.dataset.viewSection !== "atendimientos";
+    });
   });
 });
 
