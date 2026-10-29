@@ -601,37 +601,40 @@ document.querySelectorAll(".add-button").forEach((button) => {
     unlockAudio();
     addCount(button.dataset.type);
   });
+});
 
-  document.querySelectorAll(".status-button").forEach((button) => {
-    button.addEventListener("click", () => submitAttendance(button.dataset.status));
-  });
+document.querySelectorAll(".status-button").forEach((button) => {
+  button.addEventListener("click", () => submitAttendance(button.dataset.status));
+});
 
-  document.querySelectorAll(".type-button").forEach((button) => {
-    button.addEventListener("click", () => {
-      selectedAttendanceType = button.dataset.attendanceType;
-      document.querySelectorAll(".type-button").forEach((item) => item.classList.toggle("active", item === button));
-    });
-  });
-
-  attendanceForm.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" || event.shiftKey || event.target.matches("textarea")) return;
-    event.preventDefault();
-    submitAttendance(selectedAttendanceStatus);
-  });
-
-  document.querySelectorAll(".side-nav-item").forEach((button) => {
-    button.addEventListener("click", () => {
-      const view = button.dataset.view;
-      document.querySelectorAll(".side-nav-item").forEach((item) => item.classList.toggle("active", item === button));
-      document.querySelectorAll("[data-view-section]").forEach((section) => {
-        section.hidden = section.dataset.viewSection !== view;
-      });
-    });
-    document.querySelectorAll("[data-view-section]").forEach((section) => {
-      section.hidden = section.dataset.viewSection !== "atendimientos";
-    });
+document.querySelectorAll(".type-button").forEach((button) => {
+  button.addEventListener("click", () => {
+    selectedAttendanceType = button.dataset.attendanceType;
+    document.querySelectorAll(".type-button").forEach((item) => item.classList.toggle("active", item === button));
   });
 });
+
+attendanceForm.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || event.shiftKey || event.target.matches("textarea")) return;
+  event.preventDefault();
+  submitAttendance(selectedAttendanceStatus);
+});
+
+function showView(view) {
+  document.querySelectorAll(".side-nav-item").forEach((item) => {
+    item.classList.toggle("active", item.dataset.view === view);
+  });
+  document.querySelectorAll("[data-view-section]").forEach((section) => {
+    const isVisible = section.dataset.viewSection === view;
+    section.hidden = !isVisible;
+    section.classList.toggle("is-hidden", !isVisible);
+  });
+}
+
+document.querySelectorAll(".side-nav-item").forEach((button) => {
+  button.addEventListener("click", () => showView(button.dataset.view));
+});
+showView("atendimientos");
 
 alarmList.addEventListener("input", (event) => {
   unlockAudio();

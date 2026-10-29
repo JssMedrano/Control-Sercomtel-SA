@@ -121,7 +121,7 @@ h1 span, em { color: var(--red); font-style: italic; }
 .attendance-status { min-height: 16px; margin: 10px 0 0; color: var(--muted); font-size: 11px; }
 .attendance-status.success { color: var(--green); }
 .attendance-status.error { color: var(--orange); }
-.side-nav-item[hidden], [data-view-section][hidden] { display: none; }
+.side-nav-item[hidden], [data-view-section][hidden], .view-section[hidden] { display: none !important; }
 .alarm-details summary { display: flex; align-items: center; justify-content: space-between; list-style: none; cursor: pointer; }
 .alarm-details summary::-webkit-details-marker { display: none; }
 .alarm-details summary strong { display: block; font-family: "Barlow Condensed"; font-size: 23px; font-style: italic; text-transform: uppercase; }
