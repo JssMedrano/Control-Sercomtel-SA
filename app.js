@@ -25,6 +25,9 @@ const reportStatus = document.querySelector("#reportStatus");
 const scriptsList = document.querySelector("#scriptsList");
 const attendanceForm = document.querySelector("#attendanceForm");
 const attendanceStatus = document.querySelector("#attendanceStatus");
+const attendanceRecordsBody = document.querySelector("#attendanceRecordsBody");
+const emptyAttendanceRecords = document.querySelector("#emptyAttendanceRecords");
+const attendanceRecordsCount = document.querySelector("#attendanceRecordsCount");
 let selectedAttendanceStatus = "pending";
 let selectedAttendanceType = "fiber";
 const workSaturday = document.querySelector("#workSaturday");
@@ -178,6 +181,39 @@ function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  })[character]);
+}
+
+function renderAttendanceRecords() {
+  const statusLabels = { retained: "Retenido", cancelled: "Cancelado", pending: "Pendiente" };
+  const typeLabels = { fiber: "Fibras", phone: "Líneas" };
+  const records = [...state.attendances].reverse();
+  attendanceRecordsCount.textContent = `${records.length} ${records.length === 1 ? "registro" : "registros"}`;
+  attendanceRecordsBody.innerHTML = records.map((record) => `
+    <tr>
+      <td>${escapeHtml(record.date)}</td>
+      <td>${escapeHtml(typeLabels[record.type] || record.type || "—")}</td>
+      <td><span class="attendance-status-badge ${escapeHtml(record.status)}">${escapeHtml(statusLabels[record.status] || record.status)}</span></td>
+      <td>${escapeHtml(record.name) || "—"}</td>
+      <td>${escapeHtml(record.protocol) || "—"}</td>
+      <td>${escapeHtml(record.registration) || "—"}</td>
+      <td>${escapeHtml(record.contact) || "—"}</td>
+      <td>${escapeHtml(record.document) || "—"}</td>
+      <td>${escapeHtml(record.vox) || "—"}</td>
+      <td class="attendance-annotation">${escapeHtml(record.annotations) || "—"}</td>
+      <td><span class="sync-badge ${record.syncStatus === "sent" ? "sent" : "pending"}">${record.syncStatus === "sent" ? "Enviado" : "Pendiente"}</span></td>
+    </tr>
+  `).join("");
+  emptyAttendanceRecords.hidden = records.length > 0;
+}
+
 function getToday() {
   const key = localDateKey();
   return state.days[key] || { fiber: 0, phone: 0 };
@@ -201,6 +237,7 @@ function renderDashboard() {
     </tr>
   `).join("");
   emptyHistory.hidden = days.length > 0;
+  renderAttendanceRecords();
   renderMonthlyDashboard();
   renderNotes();
 }
@@ -458,7 +495,9 @@ async function submitAttendance(status) {
     date: localDateKey(),
     createdAt: new Date().toISOString(),
     status,
+    type: selectedAttendanceType,
     ...fields,
+    syncStatus: "pending",
   };
   state.attendances.push(record);
   selectedAttendanceStatus = status;
@@ -479,6 +518,11 @@ async function submitAttendance(status) {
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "No se pudo sincronizar el atendimiento.");
+    if (result.discordSent || result.saved) {
+      record.syncStatus = result.saved ? "sent" : "pending";
+      saveState();
+      renderAttendanceRecords();
+    }
     if (!result.discordSent) {
       attendanceStatus.textContent += " Discord no confirmó el envío.";
       attendanceStatus.className = "attendance-status error";

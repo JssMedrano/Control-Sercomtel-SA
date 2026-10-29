@@ -112,6 +112,40 @@
           <p class="attendance-status" id="attendanceStatus" aria-live="polite"></p>
         </form>
       </section>
+      <section class="panel attendance-records-panel view-section" data-view-section="atendimientos">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">REGISTROS</p>
+            <h2>Atendimientos realizados</h2>
+          </div>
+          <span class="records-count" id="attendanceRecordsCount">0 registros</span>
+        </div>
+        <div class="table-wrap attendance-table-wrap">
+          <table class="attendance-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Nome</th>
+                <th>Protocolo</th>
+                <th>Inscrição</th>
+                <th>Contato</th>
+                <th>CPF/CNPJ</th>
+                <th>VOX</th>
+                <th>Anotaciones</th>
+                <th>MongoDB</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceRecordsBody"></tbody>
+          </table>
+          <div class="empty-state" id="emptyAttendanceRecords">
+            <div class="empty-icon">▤</div>
+            <p>Aún no hay atendimientos registrados</p>
+            <span>Elige Retenido, Cancelado o Pendiente para guardar el primero.</span>
+          </div>
+        </div>
+      </section>
       </div>
 
       <section class="panel analytics-panel view-section" data-view-section="dashboard">
