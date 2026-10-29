@@ -82,7 +82,7 @@ h1 span, em { color: var(--red); font-style: italic; }
 .neon-pulse { animation: neon-flicker 4s infinite; text-shadow: 0 0 10px var(--cyan); }
 .live-status { gap: 8px; color: var(--green); font-size: 12px; font-weight: 600; }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(103, 214, 160, 0.12); }
-.hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 76px 0 42px; }
+.hero { display: flex; align-items: flex-start; justify-content: flex-start; gap: 24px; padding: 12px 0 8px; }
 .hero h2 { margin: 0 0 9px; font-family: "Barlow Condensed"; font-size: clamp(38px, 6vw, 66px); font-style: italic; font-weight: 700; letter-spacing: -0.02em; line-height: 0.95; text-transform: uppercase; text-shadow: 0 0 28px rgba(255, 38, 50, 0.16); }
 .hero-copy { margin: 0; color: var(--muted); font-size: 14px; }
 .daily-counters { display: flex; align-items: stretch; gap: 8px; min-width: 0; }
@@ -114,7 +114,7 @@ h1 span, em { color: var(--red); font-style: italic; }
 .add-button span { font-size: 19px; line-height: 12px; }
 .fiber-button { border-color: #31568a; background: var(--blue-soft); color: var(--blue); }
 .phone-button { border-color: #875632; background: var(--orange-soft); color: var(--orange); }
-.intake-panel { margin-top: 16px; padding: 18px; border: 1px solid var(--border); background: #050505; }
+.intake-panel { margin-top: 8px; padding: 14px; border: 1px solid var(--border); background: #050505; }
 .attendance-type-switch, .status-actions { display: flex; gap: 7px; }
 .attendance-type-switch { margin-bottom: 12px; }
 .type-button, .status-button { padding: 8px 12px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
@@ -288,7 +288,7 @@ td:last-child { color: var(--text); font-weight: 700; }
 @media (max-width: 760px) {
   .app-shell { width: min(100% - 24px, 620px); grid-template-columns: 132px minmax(0, 1fr); gap: 16px; padding-top: 14px; }
   .app-shell.sidebar-collapsed { grid-template-columns: 48px minmax(0, 1fr); gap: 16px; }
-  .hero { align-items: flex-start; flex-direction: column; padding: 56px 0 28px; }
+  .hero { padding: 8px 0 6px; }
   .daily-counters { width: 100%; }
   .today-total { flex: 0 0 104px; width: 104px; }
   .today-total span { display: block; }

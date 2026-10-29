@@ -2,7 +2,6 @@ const STORAGE_KEY = "retention-dashboard-v1";
 const alarmCount = 8;
 
 const state = loadState();
-const currentDate = document.querySelector("#currentDate");
 const todayTotal = document.querySelector("#todayTotal");
 const fiberCount = document.querySelector("#fiberCount");
 const phoneCount = document.querySelector("#phoneCount");
@@ -249,7 +248,6 @@ function renderDashboard() {
   fiberCount.textContent = today.fiber;
   phoneCount.textContent = today.phone;
   todayTotal.textContent = today.fiber + today.phone;
-  currentDate.textContent = `· ${formatDate(localDateKey())}`;
   renderRetentionMetrics();
 
   const days = Object.entries(state.days).sort(([first], [second]) => second.localeCompare(first));
