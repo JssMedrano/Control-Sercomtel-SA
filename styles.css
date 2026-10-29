@@ -131,9 +131,9 @@ h1 span, em { color: var(--red); font-style: italic; }
 .form-grid { display: grid; grid-template-columns: 1fr; gap: 5px; }
 .attendance-form label { display: grid; gap: 3px; color: var(--faint); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 .attendance-form input, .attendance-form textarea { width: 100%; padding: 6px 8px; border: 1px solid var(--border); outline: 0; background: #000; color: var(--text); font-size: 11px; }
-.notes-input-row { display: flex; align-items: stretch; gap: 8px; }
-.notes-input-row textarea { flex: 1; }
-.copy-notes-button { align-self: flex-start; padding: 7px 0; }
+.notes-label-row { display: flex; align-items: center; gap: 8px; }
+.copy-notes-button { padding: 0; color: var(--green); }
+.copy-notes-button:hover { color: var(--text); }
 .attendance-form input:focus, .attendance-form textarea:focus { border-color: var(--blue); }
 .notes-field { margin-top: 8px; }
 .attendance-status { min-height: 16px; margin: 10px 0 0; color: var(--muted); font-size: 11px; }
