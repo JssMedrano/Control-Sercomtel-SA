@@ -282,32 +282,6 @@ td:last-child { color: var(--text); font-weight: 700; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
 }
-@media (max-width: 760px) {
-  .app-shell { width: min(100% - 24px, 620px); grid-template-columns: 132px minmax(0, 1fr); gap: 16px; padding-top: 14px; }
-  .app-shell.sidebar-collapsed { grid-template-columns: 48px minmax(0, 1fr); gap: 16px; }
-  .hero { padding: 8px 0 6px; }
-  .daily-counters { width: 100%; }
-  .today-total { flex: 0 0 104px; width: 104px; }
-  .today-total span { display: block; }
-  .analytics-summary { grid-template-columns: repeat(2, 1fr); }
-  .note-form, .notes-list { grid-template-columns: 1fr; }
-  .scripts-list { grid-template-columns: 1fr; }
-  .add-note-button { min-height: 38px; }
-  .note-submit-actions { align-items: stretch; flex-direction: column; }
-  .analytics-actions { align-items: flex-end; flex-direction: column; gap: 7px; }
-}
-@media (max-width: 430px) {
-  .metric-card { padding: 8px; }
-  .panel { padding: 18px; }
-  .metric-bottom { align-items: baseline; flex-direction: row; }
-  .metric-bottom, .add-button { width: 100%; }
-  .add-button { justify-content: center; }
-  .topbar .live-status { font-size: 0; }
-  .permission-banner { align-items: flex-start; flex-direction: column; }
-  .work-saturday { align-items: flex-start; flex-direction: column; }
-  .saturday-controls { width: 100%; justify-content: space-between; }
-}
-
 /* Terminal visual theme */
 :root {
   --bg: #050505;
