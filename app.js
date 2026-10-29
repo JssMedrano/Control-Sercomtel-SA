@@ -183,7 +183,8 @@ function saveState() {
 
 function rebuildDaysFromAttendances() {
   state.days = state.attendances.reduce((days, record) => {
-    if (!days[record.date]) days[record.date] = { fiber: 0, phone: 0 };
+    if (!days[record.date]) days[record.date] = { fiber: 0, phone: 0, total: 0 };
+    days[record.date].total += 1;
     if (record.type === "fiber" || record.type === "phone") days[record.date][record.type] += 1;
     return days;
   }, {});
@@ -240,7 +241,7 @@ function renderAttendanceRecords() {
 
 function getToday() {
   const key = localDateKey();
-  return state.days[key] || { fiber: 0, phone: 0 };
+  return state.days[key] || { fiber: 0, phone: 0, total: 0 };
 }
 
 function renderDashboard() {
@@ -257,7 +258,7 @@ function renderDashboard() {
       <td>${formatDate(date)}</td>
       <td>${counts.fiber}</td>
       <td>${counts.phone}</td>
-      <td>${counts.fiber + counts.phone}</td>
+      <td>${counts.total ?? counts.fiber + counts.phone}</td>
     </tr>
   `).join("");
   emptyHistory.hidden = days.length > 0;
