@@ -477,7 +477,12 @@ async function submitAttendance(status) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(record),
     });
-    if (!response.ok) throw new Error("No se pudo sincronizar con la base de datos.");
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "No se pudo sincronizar el atendimiento.");
+    if (!result.discordSent) {
+      attendanceStatus.textContent += " Discord no confirmó el envío.";
+      attendanceStatus.className = "attendance-status error";
+    }
   } catch (error) {
     console.error("El atendimiento quedó guardado localmente, pero no se sincronizó.", error);
     attendanceStatus.textContent += " Guardado localmente; sincronización pendiente.";
@@ -635,6 +640,14 @@ document.querySelectorAll(".side-nav-item").forEach((button) => {
   button.addEventListener("click", () => showView(button.dataset.view));
 });
 showView("atendimientos");
+
+document.querySelector("#sidebarToggle").addEventListener("click", () => {
+  const collapsed = document.querySelector(".app-shell").classList.toggle("sidebar-collapsed");
+  const toggle = document.querySelector("#sidebarToggle");
+  toggle.setAttribute("aria-expanded", String(!collapsed));
+  toggle.setAttribute("aria-label", collapsed ? "Expandir menú" : "Contraer menú");
+  toggle.textContent = collapsed ? "›" : "‹";
+});
 
 alarmList.addEventListener("input", (event) => {
   unlockAudio();
