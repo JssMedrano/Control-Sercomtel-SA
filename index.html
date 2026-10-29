@@ -54,37 +54,38 @@
           <h2>Tu jornada, <em>bajo control.</em></h2>
           <p class="hero-copy">Registra cada atendimiento y mantén tus pausas en el momento justo.</p>
         </div>
-        <div class="today-total">
-          <span>Total de hoy</span>
-          <strong id="todayTotal">0</strong>
-          <small>atendimientos</small>
-          <button class="reset-button" id="resetToday" type="button">↺ Resetear hoy</button>
+        <div class="daily-counters">
+          <div class="today-total">
+            <span>Total de hoy</span>
+            <strong id="todayTotal">0</strong>
+            <small>atendimientos</small>
+            <button class="reset-button" id="resetToday" type="button" aria-label="Resetear hoy" title="Resetear hoy">↺</button>
+          </div>
+          <section class="metrics-grid" aria-label="Contadores de atendimientos">
+            <article class="metric-card fiber-card">
+              <div class="metric-heading">
+                <div class="metric-icon fiber-icon" aria-hidden="true">⌁</div>
+                <span class="metric-tag">INTERNET</span>
+              </div>
+              <h3>Fibras</h3>
+              <div class="metric-bottom">
+                <strong id="fiberCount">0</strong>
+                <span class="metric-caption">registros</span>
+              </div>
+            </article>
+            <article class="metric-card phone-card">
+              <div class="metric-heading">
+                <div class="metric-icon phone-icon" aria-hidden="true">⌕</div>
+                <span class="metric-tag">TELEFONÍA</span>
+              </div>
+              <h3>Líneas de teléfono</h3>
+              <div class="metric-bottom">
+                <strong id="phoneCount">0</strong>
+                <span class="metric-caption">registros</span>
+              </div>
+            </article>
+          </section>
         </div>
-      </section>
-
-      <section class="metrics-grid" aria-label="Contadores de atendimientos">
-        <article class="metric-card fiber-card">
-          <div class="metric-heading">
-            <div class="metric-icon fiber-icon" aria-hidden="true">⌁</div>
-            <span class="metric-tag">INTERNET</span>
-          </div>
-          <h3>Fibras</h3>
-          <div class="metric-bottom">
-            <strong id="fiberCount">0</strong>
-            <span class="metric-caption">registros</span>
-          </div>
-        </article>
-        <article class="metric-card phone-card">
-          <div class="metric-heading">
-            <div class="metric-icon phone-icon" aria-hidden="true">⌕</div>
-            <span class="metric-tag">TELEFONÍA</span>
-          </div>
-          <h3>Líneas de teléfono</h3>
-          <div class="metric-bottom">
-            <strong id="phoneCount">0</strong>
-            <span class="metric-caption">registros</span>
-          </div>
-        </article>
       </section>
       <section class="intake-panel">
         <div class="attendance-type-switch" role="group" aria-label="Tipo de atendimiento">
