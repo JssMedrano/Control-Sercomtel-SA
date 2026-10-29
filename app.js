@@ -27,6 +27,7 @@ const attendanceStatus = document.querySelector("#attendanceStatus");
 const attendanceRecordsBody = document.querySelector("#attendanceRecordsBody");
 const emptyAttendanceRecords = document.querySelector("#emptyAttendanceRecords");
 const attendanceRecordsCount = document.querySelector("#attendanceRecordsCount");
+const exportAttendancesButton = document.querySelector("#exportAttendances");
 let selectedAttendanceStatus = "pending";
 let selectedAttendanceType = "fiber";
 const workSaturday = document.querySelector("#workSaturday");
@@ -267,6 +268,41 @@ function renderAttendanceRecords() {
     </tr>
   `).join("");
   emptyAttendanceRecords.hidden = records.length > 0;
+}
+
+function exportAttendancesToExcel() {
+  if (!state.attendances.length) {
+    attendanceStatus.textContent = "No hay atendimientos para descargar.";
+    return;
+  }
+
+  const statusLabels = { retained: "Retenido", cancelled: "Cancelado", pending: "Pendiente" };
+  const typeLabels = { fiber: "Fibras", phone: "Líneas" };
+  const headers = ["Fecha", "Tipo", "Estado", "Nome", "Protocolo", "Inscrição", "Contato", "CPF/CNPJ", "VOX", "Anotaciones", "MongoDB"];
+  const records = [...state.attendances].reverse();
+  const values = records.map((record) => [
+    record.date,
+    typeLabels[record.type] || record.type,
+    statusLabels[record.status] || record.status,
+    record.name,
+    record.protocol,
+    record.registration,
+    record.contact,
+    record.document,
+    record.vox,
+    record.annotations,
+    record.syncStatus === "sent" ? "Enviado" : "Pendiente",
+  ]);
+  const escapeCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+  const csv = [headers, ...values].map((row) => row.map(escapeCell).join(";")).join("\r\n");
+  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `atendimientos-${localDateKey()}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+  attendanceStatus.textContent = `${records.length} ${records.length === 1 ? "registro exportado" : "registros exportados"}.`;
 }
 
 function getToday() {
@@ -704,6 +740,8 @@ attendanceForm.addEventListener("keydown", (event) => {
   event.preventDefault();
   submitAttendance(selectedAttendanceStatus);
 });
+
+exportAttendancesButton.addEventListener("click", exportAttendancesToExcel);
 
 function showView(view) {
   document.querySelectorAll(".side-nav-item").forEach((item) => {

@@ -12,7 +12,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" />
-    <link rel="stylesheet" href="styles.css?v=desktop" />
+    <link rel="stylesheet" href="styles.css?v=desktop-3" />
   </head>
   <body>
     <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -102,7 +102,10 @@
             <p class="eyebrow">REGISTROS</p>
             <h2>Atendimientos realizados</h2>
           </div>
-          <span class="records-count" id="attendanceRecordsCount">0 registros</span>
+          <div class="records-actions">
+            <button class="text-button" id="exportAttendances" type="button">Descargar Excel</button>
+            <span class="records-count" id="attendanceRecordsCount">0 registros</span>
+          </div>
         </div>
         <div class="table-wrap attendance-table-wrap">
           <table class="attendance-table">
@@ -305,6 +308,6 @@
         });
       }
     </script>
-    <script src="app.js?v=desktop"></script>
+    <script src="app.js?v=desktop-3"></script>
   </body>
 </html>

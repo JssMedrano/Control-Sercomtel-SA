@@ -240,6 +240,7 @@ td:last-child { color: var(--text); font-weight: 700; }
 .empty-state span { color: var(--faint); font-size: 11px; }
 .attendance-records-panel { margin-top: 16px; }
 .attendance-records-panel .panel-header { align-items: center; }
+.records-actions { display: flex; align-items: center; gap: 16px; }
 .records-count { color: var(--faint); font-size: 10px; }
 .attendance-table-wrap { min-height: 120px; margin-top: 16px; }
 .attendance-table { min-width: 1180px; }
