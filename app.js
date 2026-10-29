@@ -24,6 +24,7 @@ const reportStatus = document.querySelector("#reportStatus");
 const scriptsList = document.querySelector("#scriptsList");
 const attendanceForm = document.querySelector("#attendanceForm");
 const attendanceStatus = document.querySelector("#attendanceStatus");
+const copyAttendanceNotesButton = document.querySelector("#copyAttendanceNotes");
 const attendanceRecordsBody = document.querySelector("#attendanceRecordsBody");
 const emptyAttendanceRecords = document.querySelector("#emptyAttendanceRecords");
 const attendanceRecordsCount = document.querySelector("#attendanceRecordsCount");
@@ -742,6 +743,21 @@ attendanceForm.addEventListener("keydown", (event) => {
 });
 
 exportAttendancesButton.addEventListener("click", exportAttendancesToExcel);
+
+copyAttendanceNotesButton.addEventListener("click", async () => {
+  const notes = attendanceForm.elements.annotations.value.trim();
+  if (!notes) {
+    attendanceStatus.textContent = "No hay anotaciones para copiar.";
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(notes);
+    attendanceStatus.textContent = "Anotaciones copiadas.";
+  } catch (error) {
+    console.error("No se pudieron copiar las anotaciones.", error);
+    attendanceStatus.textContent = "No se pudieron copiar las anotaciones.";
+  }
+});
 
 function showView(view) {
   document.querySelectorAll(".side-nav-item").forEach((item) => {

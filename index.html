@@ -91,7 +91,10 @@
             <label>VOX:<input name="vox" autocomplete="off" /></label>
           </div>
           <label class="notes-field">Anotaciones del atendimiento:
-            <textarea name="annotations" rows="3" placeholder="Escribe una observación..."></textarea>
+            <span class="notes-input-row">
+              <textarea name="annotations" rows="3" placeholder="Escribe una observación..."></textarea>
+              <button class="copy-notes-button text-button" id="copyAttendanceNotes" type="button">Copiar</button>
+            </span>
           </label>
           <p class="attendance-status" id="attendanceStatus" aria-live="polite"></p>
         </form>
