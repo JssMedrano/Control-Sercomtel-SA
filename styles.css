@@ -314,12 +314,12 @@ td:last-child { color: var(--text); font-weight: 700; }
 /* Terminal visual theme */
 :root {
   --bg: #050505;
-  --surface: #090909;
+  --surface: #080808;
   --surface-raised: #0d0d0d;
-  --border: #202020;
-  --text: #d8d8d8;
-  --muted: #777;
-  --faint: #4d4d4d;
+  --border: #292929;
+  --text: #f0f0f0;
+  --muted: #b7b7b7;
+  --faint: #898989;
   --blue: #00ff66;
   --blue-soft: rgba(0, 255, 102, 0.06);
   --orange: #d7b85b;
@@ -334,27 +334,21 @@ body {
   background: #050505;
   color: var(--text);
   font-family: "Courier New", Consolas, monospace;
-  letter-spacing: 0.02em;
+  font-size: 13px;
+  letter-spacing: 0.015em;
 }
 
 body::before { background: #050505; }
 .network-texture {
-  display: block;
-  opacity: 0.18;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
-  background-size: 20px 20px;
-  mask-image: none;
-  animation: none;
+  display: none;
 }
 .app-shell { width: min(1180px, calc(100% - 24px)); gap: 16px; padding: 12px 0 24px; }
-.sidebar { background: rgba(8, 8, 8, 0.94); border-right-color: var(--border); }
+.sidebar { background: #080808; border-right-color: var(--border); }
 .sidebar-brand { color: var(--green); font-family: "Courier New", Consolas, monospace; font-size: 12px; letter-spacing: 0.12em; }
 .sidebar-toggle { border-radius: 0; background: #080808; color: var(--faint); }
 .sidebar-toggle:hover { border-color: var(--green); color: var(--green); }
 .side-nav { gap: 2px; }
-.side-nav-item { border-left-color: transparent; color: var(--faint); font-family: inherit; font-size: 10px; text-transform: uppercase; }
+.side-nav-item { border-left-color: transparent; color: var(--faint); font-family: inherit; font-size: 11px; text-transform: uppercase; }
 .side-nav-item span { color: var(--faint); font-size: 12px; }
 .side-nav-item:hover, .side-nav-item.active { border-left-color: var(--green); background: rgba(0, 255, 102, 0.04); color: var(--green); }
 .side-nav-item.active span { color: var(--green); }
@@ -367,11 +361,11 @@ body::before { background: #050505; }
 .today-total { border-color: var(--border); background: #090909; }
 .today-total strong, .metric-bottom strong { color: var(--green); font-family: inherit; font-style: normal; }
 .reset-button:hover { color: var(--green); }
-.metric-card, .panel { border-color: var(--border); background: rgba(7, 7, 7, 0.9); backdrop-filter: none; }
+.metric-card, .panel { border-color: var(--border); background: #080808; backdrop-filter: none; }
 .metric-card::before, .panel::before { right: 0; left: 0; background: var(--green); box-shadow: none; opacity: 0.5; }
 .metric-card:hover, .panel:hover { border-color: var(--green); box-shadow: none; }
 .metric-card { padding: 7px 9px; }
-.phone-card { border-color: var(--border); background: rgba(7, 7, 7, 0.9); }
+.phone-card { border-color: var(--border); background: #080808; }
 .fiber-icon, .phone-icon { background: transparent; color: var(--green); }
 .status-button, .type-button { border-radius: 0; font-family: inherit; }
 .type-button.active { border-color: var(--green); background: rgba(0, 255, 102, 0.06); color: var(--green); }
@@ -380,13 +374,14 @@ body::before { background: #050505; }
 .status-button.pending { border-color: #806f3c; color: var(--orange); }
 .status-button.retained:hover { background: rgba(0, 255, 102, 0.08); }
 .status-button.cancelled:hover, .status-button.pending:hover { background: rgba(255, 255, 255, 0.04); }
-.intake-panel { border-color: var(--border); background: rgba(5, 5, 5, 0.92); }
+.intake-panel { border-color: var(--border); background: #050505; }
 .attendance-form input, .attendance-form textarea,
 .note-form input, .note-form textarea,
 .month-picker input { border-radius: 0; border-color: var(--border); background: #000; color: var(--text); font-family: inherit; }
 .attendance-form input:focus, .attendance-form textarea:focus,
 .note-form input:focus, .note-form textarea:focus { border-color: var(--green); }
-.attendance-form label { font-family: inherit; color: var(--faint); }
+.attendance-form label { font-family: inherit; color: var(--faint); font-size: 11px; }
+.attendance-form input, .attendance-form textarea { font-size: 12px; }
 .attendance-status.success, .report-status.success, .sync-badge.sent,
 .attendance-status-badge.retained { color: var(--green); }
 .attendance-status.error, .report-status.error { color: var(--orange); }
