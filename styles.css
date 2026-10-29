@@ -124,11 +124,11 @@ h1 span, em { color: var(--red); font-style: italic; }
 .status-button.cancelled:hover { background: rgba(255, 38, 50, 0.12); }
 .status-button.pending { border-color: #765d1e; color: #e7c84e; }
 .status-button.pending:hover { background: rgba(231, 200, 78, 0.12); }
-.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.attendance-form label { display: grid; gap: 6px; color: var(--faint); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-.attendance-form input, .attendance-form textarea { width: 100%; padding: 10px; border: 1px solid var(--border); outline: 0; background: #000; color: var(--text); font-size: 12px; }
+.form-grid { display: grid; grid-template-columns: 1fr; gap: 5px; }
+.attendance-form label { display: grid; gap: 3px; color: var(--faint); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.attendance-form input, .attendance-form textarea { width: 100%; padding: 6px 8px; border: 1px solid var(--border); outline: 0; background: #000; color: var(--text); font-size: 11px; }
 .attendance-form input:focus, .attendance-form textarea:focus { border-color: var(--blue); }
-.notes-field { margin-top: 10px; }
+.notes-field { margin-top: 8px; }
 .attendance-status { min-height: 16px; margin: 10px 0 0; color: var(--muted); font-size: 11px; }
 .attendance-status.success { color: var(--green); }
 .attendance-status.error { color: var(--orange); }
