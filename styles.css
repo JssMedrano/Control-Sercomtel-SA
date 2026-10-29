@@ -270,6 +270,7 @@ td:last-child { color: var(--text); font-weight: 700; }
 }
 @media (max-width: 760px) {
   .app-shell { width: min(100% - 24px, 620px); grid-template-columns: 132px minmax(0, 1fr); gap: 16px; padding-top: 14px; }
+  .app-shell.sidebar-collapsed { grid-template-columns: 48px minmax(0, 1fr); gap: 16px; }
   .hero { align-items: flex-start; flex-direction: column; padding: 56px 0 28px; }
   .today-total { width: 100%; text-align: left; }
   .today-total strong { display: inline; margin-right: 5px; }
