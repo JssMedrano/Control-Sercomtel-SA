@@ -189,6 +189,7 @@ function renderDashboard() {
   phoneCount.textContent = today.phone;
   todayTotal.textContent = today.fiber + today.phone;
   currentDate.textContent = `· ${formatDate(localDateKey())}`;
+  renderRetentionMetrics();
 
   const days = Object.entries(state.days).sort(([first], [second]) => second.localeCompare(first));
   historyBody.innerHTML = days.map(([date, counts]) => `
@@ -202,6 +203,33 @@ function renderDashboard() {
   emptyHistory.hidden = days.length > 0;
   renderMonthlyDashboard();
   renderNotes();
+}
+
+function getAttendanceCounts(records) {
+  return records.reduce((counts, record) => {
+    if (record.status === "retained") counts.retained += 1;
+    if (record.status === "cancelled") counts.cancelled += 1;
+    if (record.status === "pending") counts.pending += 1;
+    return counts;
+  }, { retained: 0, cancelled: 0, pending: 0 });
+}
+
+function retentionRate(records) {
+  if (!records.length) return "0";
+  return ((getAttendanceCounts(records).retained / records.length) * 100).toFixed(1);
+}
+
+function renderRetentionMetrics() {
+  const todayRecords = state.attendances.filter((record) => record.date === localDateKey());
+  const monthRecords = state.attendances.filter((record) => record.date.startsWith(currentMonthKey()));
+  const todayCounts = getAttendanceCounts(todayRecords);
+  const monthCounts = getAttendanceCounts(monthRecords);
+  document.querySelector("#retainedCount").textContent = todayCounts.retained;
+  document.querySelector("#cancelledCount").textContent = todayCounts.cancelled;
+  document.querySelector("#pendingCount").textContent = todayCounts.pending;
+  document.querySelector("#dailyRetention").textContent = `${retentionRate(todayRecords)}%`;
+  document.querySelector("#monthlyRetention").textContent = `${retentionRate(monthRecords)}%`;
+  return { monthCounts };
 }
 
 function currentMonthKey() {
@@ -218,11 +246,13 @@ function renderMonthlyDashboard() {
     phone: result.phone + counts.phone,
   }), { fiber: 0, phone: 0 });
   const total = totals.fiber + totals.phone;
+  const monthRecords = state.attendances.filter((record) => record.date.startsWith(month));
 
   document.querySelector("#monthlyTotal").textContent = total;
   document.querySelector("#dailyAverage").textContent = monthDays.length ? (total / monthDays.length).toFixed(1) : "0";
   document.querySelector("#registeredDays").textContent = monthDays.length;
   document.querySelector("#monthlySplit").textContent = `${totals.fiber} / ${totals.phone}`;
+  document.querySelector("#monthlyRetention").textContent = `${retentionRate(monthRecords)}%`;
 
   const maxTotal = Math.max(...monthDays.map(([, counts]) => counts.fiber + counts.phone), 1);
   monthlyChart.innerHTML = monthDays.length ? monthDays.map(([date, counts]) => {
@@ -431,6 +461,7 @@ async function submitAttendance(status) {
     ...fields,
   };
   state.attendances.push(record);
+  selectedAttendanceStatus = status;
   const counterType = selectedAttendanceType;
   if (!state.days[record.date]) state.days[record.date] = { fiber: 0, phone: 0 };
   state.days[record.date][counterType] += 1;
@@ -795,6 +826,7 @@ document.querySelector("#resetToday").addEventListener("click", () => {
   if (!today || today.fiber + today.phone === 0) return;
   if (window.confirm("¿Quieres resetear los atendimientos de hoy? El historial de días anteriores se conservará.")) {
     delete state.days[todayKey];
+    state.attendances = state.attendances.filter((record) => record.date !== todayKey);
     saveState();
     renderDashboard();
   }

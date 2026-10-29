@@ -70,9 +70,7 @@
           <h3>Fibras</h3>
           <div class="metric-bottom">
             <strong id="fiberCount">0</strong>
-            <button class="add-button fiber-button" data-type="fiber" type="button">
-              <span>+</span> Registrar
-            </button>
+            <span class="metric-caption">registros</span>
           </div>
         </article>
         <article class="metric-card phone-card">
@@ -83,9 +81,7 @@
           <h3>Líneas de teléfono</h3>
           <div class="metric-bottom">
             <strong id="phoneCount">0</strong>
-            <button class="add-button phone-button" data-type="phone" type="button">
-              <span>+</span> Registrar
-            </button>
+            <span class="metric-caption">registros</span>
           </div>
         </article>
       </section>
@@ -95,9 +91,9 @@
           <button class="type-button" type="button" data-attendance-type="phone">Líneas</button>
         </div>
         <div class="status-actions" role="group" aria-label="Estado del atendimiento">
-          <button class="status-button retained" type="button" data-status="retained">Retenido</button>
-          <button class="status-button cancelled" type="button" data-status="cancelled">Cancelado</button>
-          <button class="status-button pending" type="button" data-status="pending">Pendiente</button>
+          <button class="status-button retained" type="button" data-status="retained">Retenido <span id="retainedCount">0</span></button>
+          <button class="status-button cancelled" type="button" data-status="cancelled">Cancelado <span id="cancelledCount">0</span></button>
+          <button class="status-button pending" type="button" data-status="pending">Pendiente <span id="pendingCount">0</span></button>
         </div>
         <form id="attendanceForm" class="attendance-form">
           <div class="form-grid">
@@ -151,6 +147,16 @@
             <span>Distribución</span>
             <strong id="monthlySplit">0 / 0</strong>
             <small>fibras / teléfonos</small>
+          </div>
+          <div class="summary-item retention-summary">
+            <span>Retención mensual</span>
+            <strong id="monthlyRetention">0%</strong>
+            <small>retenidos / atendidos</small>
+          </div>
+          <div class="summary-item">
+            <span>Retención diaria</span>
+            <strong id="dailyRetention">0%</strong>
+            <small>hoy</small>
           </div>
         </div>
         <div class="chart" id="monthlyChart" aria-label="Atendimientos por día"></div>

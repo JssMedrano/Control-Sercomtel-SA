@@ -79,19 +79,20 @@ h1 span, em { color: var(--red); font-style: italic; }
 .today-total strong { display: block; margin: 1px 0; color: var(--text); font-family: "Space Grotesk"; font-size: 32px; }
 .reset-button { margin-top: 12px; padding: 5px 0; border: 0; background: none; color: var(--faint); font-size: 10px; transition: color 0.15s; }
 .reset-button:hover { color: var(--orange); }
-.metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.metrics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 170px)); gap: 8px; }
 .metric-card, .panel { position: relative; overflow: hidden; border: 1px solid rgba(100, 100, 100, 0.4); background: linear-gradient(145deg, rgba(19, 19, 21, 0.9), rgba(5, 5, 6, 0.94)); border-radius: 4px; box-shadow: 0 16px 45px rgba(0, 0, 0, 0.38), inset 0 1px rgba(255, 255, 255, 0.035); backdrop-filter: blur(12px); }
 .metric-card::before, .panel::before { position: absolute; top: 0; right: 24px; left: 24px; height: 1px; background: linear-gradient(90deg, transparent, var(--red), transparent); box-shadow: 0 0 14px var(--red); content: ""; opacity: 0.65; }
 .metric-card:hover, .panel:hover { border-color: rgba(255, 38, 50, 0.65); box-shadow: 0 18px 55px rgba(190, 26, 40, 0.12), inset 0 1px rgba(255, 255, 255, 0.05); }
-.metric-card { padding: 24px; }
+.metric-card { padding: 12px; }
 .metric-heading { justify-content: space-between; }
-.metric-icon { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 11px; font-size: 24px; }
+.metric-icon { display: grid; width: 27px; height: 27px; place-items: center; border-radius: 7px; font-size: 17px; }
 .fiber-icon { background: var(--blue-soft); color: var(--blue); }
 .phone-icon { background: var(--orange-soft); color: var(--orange); transform: rotate(90deg); }
-.metric-tag { color: var(--faint); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; }
-.metric-card h3 { margin: 25px 0 16px; font-size: 16px; font-weight: 500; }
+.metric-tag { color: var(--faint); font-size: 8px; font-weight: 700; letter-spacing: 0.12em; }
+.metric-card h3 { margin: 10px 0 9px; font-size: 12px; font-weight: 500; }
 .metric-bottom { justify-content: space-between; gap: 12px; }
-.metric-bottom strong { font-family: "Barlow Condensed"; font-size: 58px; font-style: italic; letter-spacing: -0.04em; line-height: 0.85; text-shadow: 0 0 18px rgba(255, 38, 50, 0.35); }
+.metric-bottom strong { font-family: "Barlow Condensed"; font-size: 30px; font-style: italic; letter-spacing: -0.04em; line-height: 0.85; text-shadow: 0 0 18px rgba(255, 38, 50, 0.35); }
+.metric-caption { color: var(--faint); font-size: 9px; }
 .add-button { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid transparent; border-radius: 9px; color: var(--text); font-size: 12px; font-weight: 600; transition: transform 0.15s, background 0.15s; }
 .add-button:hover { transform: translateY(-2px); }
 .add-button:active { transform: translateY(0); }
@@ -105,6 +106,7 @@ h1 span, em { color: var(--red); font-style: italic; }
 .type-button.active { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); }
 .status-actions { margin-bottom: 16px; }
 .status-button { flex: 1; }
+.status-button span { display: inline-grid; min-width: 17px; height: 17px; margin-left: 4px; place-items: center; border: 1px solid currentColor; border-radius: 50%; font-size: 10px; }
 .status-button.retained { border-color: #1c6b45; color: #5ee991; }
 .status-button.retained:hover { background: rgba(37, 211, 102, 0.12); }
 .status-button.cancelled { border-color: #6f2027; color: var(--red); }
@@ -167,7 +169,7 @@ h1 span, em { color: var(--red); font-style: italic; }
 .month-picker input { padding: 7px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text); font-size: 11px; }
 .report-button { padding: 7px 9px; border: 1px solid #31568a; border-radius: 7px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 600; }
 .report-button:hover { background: rgba(63, 139, 255, 0.2); }
-.analytics-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 22px; }
+.analytics-summary { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 22px; }
 .summary-item { padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: rgba(9, 13, 19, 0.42); }
 .summary-item span, .summary-item small { display: block; color: var(--muted); font-size: 11px; }
 .summary-item strong { display: block; margin: 5px 0 2px; color: var(--text); font-family: "Space Grotesk"; font-size: 25px; }
