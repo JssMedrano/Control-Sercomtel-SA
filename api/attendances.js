@@ -18,7 +18,6 @@ export default async function handler(request, response) {
 
   let client;
   let mongoSaved = false;
-  let discordSent = false;
   try {
     const record = {
       ...request.body,
@@ -43,37 +42,10 @@ export default async function handler(request, response) {
       }
     }
 
-    if (process.env.DISCORD_WEBHOOK_URL) {
-      const statusLabels = { retained: "RETENIDO", cancelled: "CANCELADO", pending: "PENDIENTE" };
-      const discordResponse = await fetch(process.env.DISCORD_WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: "Retención · Atendimientos",
-          embeds: [{
-            title: `${statusLabels[request.body.status]} · ${request.body.name || "Sin nombre"}`,
-            description: request.body.annotations || "Sin anotaciones.",
-            color: request.body.status === "retained" ? 5814783 : request.body.status === "cancelled" ? 16721842 : 15105570,
-            fields: [
-              { name: "Fecha", value: request.body.date, inline: true },
-              { name: "Protocolo", value: request.body.protocol || "—", inline: true },
-              { name: "Inscrição", value: request.body.registration || "—", inline: true },
-              { name: "Contato", value: request.body.contact || "—", inline: true },
-              { name: "CPF/CNPJ", value: request.body.document || "—", inline: true },
-              { name: "VOX", value: request.body.vox || "—", inline: true },
-            ],
-            timestamp: record.createdAt.toISOString(),
-          }],
-        }),
-      });
-      discordSent = discordResponse.ok;
-      if (!discordSent) console.error("Discord rechazó el atendimiento.", await discordResponse.text());
+    if (!mongoSaved) {
+      return response.status(503).json({ error: "MongoDB no está configurado o rechazó el registro." });
     }
-
-    if (!mongoSaved && !discordSent) {
-      return response.status(503).json({ error: "MongoDB y Discord no están configurados o rechazaron el registro." });
-    }
-    return response.status(201).json({ saved: mongoSaved, discordSent });
+    return response.status(201).json({ saved: true });
   } catch (error) {
     console.error("No se pudo guardar el atendimiento en MongoDB.", error);
     return response.status(502).json({ error: "No se pudo guardar o enviar el atendimiento." });

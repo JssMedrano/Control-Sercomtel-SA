@@ -347,7 +347,7 @@ function getMonthlyReportMessage() {
 
 async function sendReport(month, type, markAsSent = false) {
   const title = type === "daily" ? `Informe diario · ${formatDate(month)}` : `Informe mensual · ${month}`;
-  const report = buildReport(month, title);
+  const report = { title, period: month, type };
   reportStatus.className = "report-status";
   reportStatus.textContent = "Enviando informe...";
   try {
@@ -507,7 +507,7 @@ async function submitAttendance(status) {
   saveState();
   renderDashboard();
   attendanceForm.reset();
-  attendanceStatus.textContent = `Atendimiento ${status === "retained" ? "retenido" : status === "cancelled" ? "cancelado" : "pendiente"} registrado.`;
+  attendanceStatus.textContent = `Atendimiento ${status === "retained" ? "retenido" : status === "cancelled" ? "cancelado" : "pendiente"} registrado localmente.`;
   attendanceStatus.className = "attendance-status success";
 
   try {
@@ -518,14 +518,11 @@ async function submitAttendance(status) {
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "No se pudo sincronizar el atendimiento.");
-    if (result.discordSent || result.saved) {
-      record.syncStatus = result.saved ? "sent" : "pending";
+    if (result.saved) {
+      record.syncStatus = "sent";
       saveState();
       renderAttendanceRecords();
-    }
-    if (!result.discordSent) {
-      attendanceStatus.textContent += " Discord no confirmó el envío.";
-      attendanceStatus.className = "attendance-status error";
+      attendanceStatus.textContent = "Atendimiento guardado en MongoDB.";
     }
   } catch (error) {
     console.error("El atendimiento quedó guardado localmente, pero no se sincronizó.", error);
