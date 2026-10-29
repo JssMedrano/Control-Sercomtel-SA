@@ -61,6 +61,37 @@ Obs: Cliente entrou em contato para solicitar o cancelamento do serviço, inform
 ];
 let customScripts = loadCustomScripts();
 
+async function loadScriptsFromDatabase() {
+  try {
+    const response = await fetch("/api/scripts");
+    const result = await response.json();
+    if (!response.ok || !Array.isArray(result.scripts)) {
+      throw new Error(result.error || "MongoDB no devolvió scripts válidos.");
+    }
+    customScripts = result.scripts;
+    localStorage.setItem(`${STORAGE_KEY}-scripts`, JSON.stringify(customScripts));
+    renderScripts();
+  } catch (error) {
+    console.error("No se pudieron cargar los scripts desde MongoDB.", error);
+  }
+}
+
+async function saveScriptToDatabase(script) {
+  const response = await fetch("/api/scripts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(script),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || "No se pudo guardar el script.");
+}
+
+async function deleteScriptFromDatabase(id) {
+  const response = await fetch(`/api/scripts?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || "No se pudo eliminar el script.");
+}
+
 function loadCustomScripts() {
   try {
     const saved = JSON.parse(localStorage.getItem(`${STORAGE_KEY}-scripts`));
@@ -824,9 +855,13 @@ scriptsList.addEventListener("click", (event) => {
   }
   const deleteButton = event.target.closest("[data-custom-script-delete]");
   if (deleteButton) {
-    customScripts.splice(Number(deleteButton.dataset.customScriptDelete), 1);
+    const scriptIndex = Number(deleteButton.dataset.customScriptDelete);
+    const [script] = customScripts.splice(scriptIndex, 1);
     localStorage.setItem(`${STORAGE_KEY}-scripts`, JSON.stringify(customScripts));
     renderScripts();
+    deleteScriptFromDatabase(script.id).catch((error) => {
+      console.error("No se pudo eliminar el script de MongoDB.", error);
+    });
     return;
   }
   const button = event.target.closest(".copy-script");
@@ -845,16 +880,22 @@ document.querySelector("#cancelScript").addEventListener("click", () => {
   document.querySelector("#customScriptForm").hidden = true;
 });
 
-document.querySelector("#customScriptForm").addEventListener("submit", (event) => {
+document.querySelector("#customScriptForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const title = document.querySelector("#scriptTitle").value.trim();
   const text = document.querySelector("#scriptContent").value.trim();
   if (!title || !text) return;
-  customScripts.push({ title, text });
+  const script = { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, title, text, createdAt: new Date().toISOString() };
+  customScripts.push(script);
   localStorage.setItem(`${STORAGE_KEY}-scripts`, JSON.stringify(customScripts));
   event.currentTarget.reset();
   event.currentTarget.hidden = true;
   renderScripts();
+  try {
+    await saveScriptToDatabase(script);
+  } catch (error) {
+    console.error("No se pudo guardar el script en MongoDB.", error);
+  }
 });
 
 document.querySelector("#resetToday").addEventListener("click", () => {
@@ -873,6 +914,7 @@ renderDashboard();
 loadAttendancesFromDatabase();
 renderAlarms();
 renderScripts();
+loadScriptsFromDatabase();
 renderSaturdayReminder();
 updatePermissionBanner();
 syncAlarmsWithWorker();
