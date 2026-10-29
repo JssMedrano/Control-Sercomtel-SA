@@ -12,7 +12,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=desktop" />
   </head>
   <body>
     <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -295,6 +295,16 @@
     </main>
 
     <div class="notification-stack" id="notificationStack" aria-live="polite"></div>
-    <script src="app.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", async () => {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(registrations.map((registration) => registration.unregister()));
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+        });
+      }
+    </script>
+    <script src="app.js?v=desktop"></script>
   </body>
 </html>
