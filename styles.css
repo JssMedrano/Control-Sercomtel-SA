@@ -208,9 +208,6 @@ h1 span, em { color: var(--red); font-style: italic; }
 .add-note-button { padding: 0 14px; border: 1px solid #31568a; border-radius: 8px; background: var(--blue-soft); color: var(--blue); font-size: 12px; font-weight: 600; }
 .add-note-button:hover { background: rgba(63, 139, 255, 0.2); }
 .note-submit-actions, .report-buttons { display: flex; align-items: center; gap: 8px; }
-.whatsapp-button { padding: 9px 11px; border: 1px solid #1c6b45; border-radius: 8px; background: rgba(37, 211, 102, 0.08); color: #5ee991; font-size: 11px; font-weight: 700; }
-.whatsapp-button:hover { background: rgba(37, 211, 102, 0.16); }
-.whatsapp-button.compact { padding: 7px 9px; border-radius: 7px; }
 .add-note-button:disabled { cursor: wait; opacity: 0.6; }
 .note-status { min-height: 16px; margin: 10px 0 0; color: var(--muted); font-size: 11px; }
 .note-status.success { color: var(--green); }
