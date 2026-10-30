@@ -300,6 +300,19 @@
     </main>
 
     <div class="notification-stack" id="notificationStack" aria-live="polite"></div>
+    <div class="attendance-modal" id="attendanceModal" hidden>
+      <div class="attendance-modal-backdrop" data-attendance-modal-close></div>
+      <section class="attendance-modal-card" role="dialog" aria-modal="true" aria-labelledby="attendanceModalTitle">
+        <div class="attendance-modal-header">
+          <div>
+            <p class="eyebrow">DETALLE DEL ATENDIMIENTO</p>
+            <h2 id="attendanceModalTitle">Registro</h2>
+          </div>
+          <button class="attendance-modal-close" type="button" aria-label="Cerrar detalle" data-attendance-modal-close>×</button>
+        </div>
+        <div class="attendance-modal-fields" id="attendanceModalFields"></div>
+      </section>
+    </div>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", async () => {

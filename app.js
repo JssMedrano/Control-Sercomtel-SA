@@ -29,6 +29,9 @@ const attendanceRecordsBody = document.querySelector("#attendanceRecordsBody");
 const emptyAttendanceRecords = document.querySelector("#emptyAttendanceRecords");
 const attendanceRecordsCount = document.querySelector("#attendanceRecordsCount");
 const exportAttendancesButton = document.querySelector("#exportAttendances");
+const attendanceModal = document.querySelector("#attendanceModal");
+const attendanceModalTitle = document.querySelector("#attendanceModalTitle");
+const attendanceModalFields = document.querySelector("#attendanceModalFields");
 let selectedAttendanceStatus = "pending";
 let selectedAttendanceType = "fiber";
 const workSaturday = document.querySelector("#workSaturday");
@@ -253,8 +256,8 @@ function renderAttendanceRecords() {
   const typeLabels = { fiber: "Fibras", phone: "Líneas" };
   const records = [...state.attendances].reverse();
   attendanceRecordsCount.textContent = `${records.length} ${records.length === 1 ? "registro" : "registros"}`;
-  attendanceRecordsBody.innerHTML = records.map((record) => `
-    <tr>
+  attendanceRecordsBody.innerHTML = records.map((record, index) => `
+    <tr class="attendance-record-row" data-attendance-index="${index}" tabindex="0" role="button">
       <td>${escapeHtml(record.date)}</td>
       <td>${escapeHtml(typeLabels[record.type] || record.type || "—")}</td>
       <td><span class="attendance-status-badge ${escapeHtml(record.status)}">${escapeHtml(statusLabels[record.status] || record.status)}</span></td>
@@ -269,6 +272,42 @@ function renderAttendanceRecords() {
     </tr>
   `).join("");
   emptyAttendanceRecords.hidden = records.length > 0;
+}
+
+function openAttendanceModal(record) {
+  const statusLabels = { retained: "Retenido", cancelled: "Cancelado", pending: "Pendiente" };
+  const typeLabels = { fiber: "Fibras", phone: "Líneas" };
+  attendanceModalTitle.textContent = record.name || "Atendimiento sin nombre";
+  const fields = [
+    ["Fecha", record.date],
+    ["Tipo", typeLabels[record.type] || record.type],
+    ["Estado", statusLabels[record.status] || record.status],
+    ["Nome", record.name],
+    ["Protocolo", record.protocol],
+    ["Inscrição", record.registration],
+    ["Contato", record.contact],
+    ["CPF/CNPJ", record.document],
+    ["VOX", record.vox],
+    ["Anotaciones", record.annotations],
+    ["MongoDB", record.syncStatus === "sent" ? "Enviado" : "Pendiente"],
+  ];
+  attendanceModalFields.replaceChildren(...fields.map(([label, value]) => {
+    const item = document.createElement("div");
+    const name = document.createElement("span");
+    const content = document.createElement("strong");
+    name.textContent = label;
+    content.textContent = value || "—";
+    item.append(name, content);
+    return item;
+  }));
+  attendanceModal.hidden = false;
+  document.body.classList.add("modal-open");
+  attendanceModal.querySelector("[data-attendance-modal-close]").focus();
+}
+
+function closeAttendanceModal() {
+  attendanceModal.hidden = true;
+  document.body.classList.remove("modal-open");
 }
 
 function exportAttendancesToExcel() {
@@ -743,6 +782,26 @@ attendanceForm.addEventListener("keydown", (event) => {
 });
 
 exportAttendancesButton.addEventListener("click", exportAttendancesToExcel);
+
+attendanceRecordsBody.addEventListener("click", (event) => {
+  const row = event.target.closest("[data-attendance-index]");
+  if (!row) return;
+  openAttendanceModal([...state.attendances].reverse()[Number(row.dataset.attendanceIndex)]);
+});
+
+attendanceRecordsBody.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  event.target.click();
+});
+
+attendanceModal.addEventListener("click", (event) => {
+  if (event.target.closest("[data-attendance-modal-close]")) closeAttendanceModal();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !attendanceModal.hidden) closeAttendanceModal();
+});
 
 copyAttendanceNotesButton.addEventListener("click", async () => {
   const notes = attendanceForm.elements.annotations.value.trim();
