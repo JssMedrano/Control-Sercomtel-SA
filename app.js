@@ -759,6 +759,24 @@ copyAttendanceNotesButton.addEventListener("click", async () => {
   }
 });
 
+document.querySelectorAll("[data-copy-field]").forEach((button) => {
+  button.addEventListener("click", async () => {
+    const field = attendanceForm.elements[button.dataset.copyField];
+    const value = field.value.trim();
+    if (!value) {
+      attendanceStatus.textContent = "No hay texto para copiar.";
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(value);
+      attendanceStatus.textContent = `${button.dataset.copyField} copiado.`;
+    } catch (error) {
+      console.error("No se pudo copiar el campo del atendimiento.", error);
+      attendanceStatus.textContent = "No se pudo copiar el texto.";
+    }
+  });
+});
+
 function showView(view) {
   document.querySelectorAll(".side-nav-item").forEach((item) => {
     item.classList.toggle("active", item.dataset.view === view);
